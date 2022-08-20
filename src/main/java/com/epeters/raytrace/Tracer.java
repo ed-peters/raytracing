@@ -1,5 +1,7 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.geometry.Sphere;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +23,9 @@ public class Tracer {
     private final int bouncesPerPixel;
     private final double sampleScale;
     private final Camera camera;
-    private final List<Hittable> world;
+    private final List<Solid> world;
 
-    public Tracer(Camera camera, List<Hittable> world) {
+    public Tracer(Camera camera, List<Solid> world) {
         this.samplesPerPixel = SAMPLES_PER_PIXEL;
         this.bouncesPerPixel = BOUNCES_PER_PIXEL;
         this.sampleScale = 1.0 / samplesPerPixel;
@@ -70,7 +72,7 @@ public class Tracer {
         }
 
         // if we don't hit, this ray will contribute the background color
-        Hit hit = Hittable.computeHit(world, ray);
+        Hit hit = Solid.computeHit(world, ray);
         if (hit == null) {
             return backgroundColor(ray);
         }
@@ -91,9 +93,9 @@ public class Tracer {
 
     public static void main(String [] args) {
 
-        List<Hittable> world = new ArrayList<>();
-        world.add(new Sphere(new Vector(0.0, 0.0, -1.0), 0.5));
-        world.add(new Sphere(new Vector(0.0, -100.5, -1.0), 100.0));
+        List<Solid> world = new ArrayList<>();
+        world.add(new Solid(new Sphere(new Vector(0.0, 0.0, -1.0), 0.5)));
+        world.add(new Solid(new Sphere(new Vector(0.0, -100.5, -1.0), 100.0)));
 
         Camera camera = new Camera(ORIGIN);
         Tracer tracer = new Tracer(camera, world);
