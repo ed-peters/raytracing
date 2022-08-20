@@ -22,6 +22,10 @@ public record Vector(double x, double y, double z) {
         return new Vector(x - other.x, y - other.y, z - other.z);
     }
 
+    public Vector mul(Vector other) {
+        return new Vector(x * other.x, y * other.y, z * other.z);
+    }
+
     public Vector mul(double f) {
         return new Vector(x * f, y * f, z * f);
     }
@@ -55,31 +59,5 @@ public record Vector(double x, double y, double z) {
                 scaleInt(x, 255),
                 scaleInt(y, 255),
                 scaleInt(z, 255) };
-    }
-
-    public Vector randomHemisphericBounce() {
-        Vector next = randomOnUnitSphere();
-        if (!isOpposite(next)) {
-            next = next.negate();
-        }
-        return next;
-    }
-
-    public static Vector randomInUnitSphere() {
-        while (true) {
-            Vector next = Utils.randomVector(-1.0f, 1.0f);
-            if (next.square() < 1.0f) {
-                return next;
-            }
-        }
-    }
-
-    public static Vector randomOnUnitSphere() {
-        while (true) {
-            Vector next = Utils.randomVector(-1.0f, 1.0f);
-            if (next.square() < 1.0f) {
-                return next.normalize();
-            }
-        }
     }
 }
