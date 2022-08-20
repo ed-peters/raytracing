@@ -44,6 +44,9 @@ public class Tracer {
     public Image render(int imageWidth) {
         Image canvas = new Image(imageWidth, (int)(imageWidth / camera.aspectRatio));
         canvas.forEach((x,y) -> {
+            if (x == 0) {
+                System.err.println("new row: "+y);
+            }
             for (int s=0; s<samplesPerPixel; s++) {
                 Ray ray = computeRay(canvas, x, y);
                 Vector color = computeColor(ray, bouncesPerPixel);
@@ -106,19 +109,19 @@ public class Tracer {
 
         Material ground = Material.lambertian(0.8, 0.8, 0.0);
         Material center = Material.lambertian(0.7, 0.3, 0.3);
-        Material left = Material.metal(0.8, 0.8, 0.8);
-        Material right = Material.metal(0.8, 0.6, 0.2);
+        Material left = Material.metal(0.8, 0.8, 0.8, 0.0);
+        Material right = Material.metal(0.8, 0.6, 0.2, 1.0);
 
         List<Solid> world = new ArrayList<>();
         world.add(Solid.sphere(0.0, -100.5, -1.0, 100.0, ground));
-        world.add(Solid.sphere(0.0, 0.0, -1.0, 0.5, center));
-        world.add(Solid.sphere(-1.0, 0.0, -1.0, 0.5, left));
+        world.add(Solid.sphere(-1.0, 0.0, -1.0, 0.5, center));
+        world.add(Solid.sphere(0.0, 0.0, -1.0, 0.5, left));
         world.add(Solid.sphere(1.0, 0.0, -1.0, 0.5, right));
 
         Camera camera = new Camera(ORIGIN);
         Tracer tracer = new Tracer(camera, world);
 
-        Image image = time(() -> tracer.render(800));
+        Image image = time(() -> tracer.render(1200));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }
 }

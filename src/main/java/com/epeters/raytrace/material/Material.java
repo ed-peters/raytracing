@@ -14,4 +14,8 @@ public interface Material {
     static Material metal(double r, double g, double b) {
         return new Metal(new Vector(r, g, b));
     }
+
+    static Material metal(double r, double g, double b, double f) {
+        return new Metal(new Vector(r, g, b), f);
+    }
 }
