@@ -6,11 +6,11 @@ package com.epeters.raytrace;
  */
 public class Camera {
 
-    public static final float DEFAULT_ASPECT_RATIO = 16.0f / 9.0f;
-    public static final float DEFAULT_VIEWPORT_HEIGHT = 2.0f;
-    public static final float DEFAULT_FOCAL_LENGTH = 1.0f;
+    public static final double DEFAULT_ASPECT_RATIO = 16.0 / 9.0;
+    public static final double DEFAULT_VIEWPORT_HEIGHT = 2.0;
+    public static final double DEFAULT_FOCAL_LENGTH = 1.0;
 
-    public final float aspectRatio;
+    public final double aspectRatio;
     public final Vector origin;
     public final Vector lowerLeft;
     public final Vector horizontal;
@@ -20,22 +20,22 @@ public class Camera {
         this(origin, DEFAULT_VIEWPORT_HEIGHT, DEFAULT_ASPECT_RATIO, DEFAULT_FOCAL_LENGTH);
     }
 
-    public Camera(Vector origin, float viewportHeight, float aspectRatio, float focalLength) {
+    public Camera(Vector origin, double viewportHeight, double aspectRatio, double focalLength) {
 
-        float viewportWidth = aspectRatio * viewportHeight;
-        Vector focalVector = new Vector(0.0f, 0.0f, focalLength);
+        double viewportWidth = aspectRatio * viewportHeight;
+        Vector focalVector = new Vector(0.0, 0.0, focalLength);
 
         this.origin = origin;
         this.aspectRatio = aspectRatio;
-        this.horizontal = new Vector(viewportWidth, 0.0f, 0.0f);
-        this.vertical = new Vector(0.0f, viewportHeight, 0.0f);
+        this.horizontal = new Vector(viewportWidth, 0.0, 0.0);
+        this.vertical = new Vector(0.0, viewportHeight, 0.0);
         this.lowerLeft = origin
-                .minus(horizontal.mul(0.5f))
-                .minus(vertical.mul(0.5f))
+                .minus(horizontal.mul(0.5))
+                .minus(vertical.mul(0.5))
                 .minus(focalVector);
     }
 
-    public Ray computeRay(float u, float v) {
+    public Ray computeRay(double u, double v) {
         Vector direction = lowerLeft
                 .plus(horizontal.mul(u))
                 .plus(vertical.mul(v))

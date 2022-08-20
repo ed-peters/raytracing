@@ -8,11 +8,11 @@ import java.util.List;
  */
 public interface Hittable {
 
-    Hit hit(Ray ray, float tmin, float tmax);
+    Hit hit(Ray ray, double tmin, double tmax);
 
     static Hit computeHit(List<Hittable> hittables, Ray ray) {
-        float tmin = 0.000001f;
-        float tcur = Float.MAX_VALUE;
+        double tmin = 0.000001f;
+        double tcur = Double.MAX_VALUE;
         Hit best = null;
         for (Hittable solid : hittables) {
             Hit hit = solid.hit(ray, tmin, tcur);

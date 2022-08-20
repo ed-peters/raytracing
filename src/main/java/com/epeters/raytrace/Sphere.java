@@ -5,22 +5,22 @@ import static com.epeters.raytrace.Utils.sqrt;
 /**
  * Implementation of {@link Hittable} logic for a simple sphere.
  */
-public record Sphere(Vector center, float radius) implements Hittable {
+public record Sphere(Vector center, double radius) implements Hittable {
 
     @Override
-    public Hit hit(Ray ray, float tmin, float tmax) {
+    public Hit hit(Ray ray, double tmin, double tmax) {
 
         Vector oc = ray.origin().minus(center);
-        float a = ray.direction().square();
-        float hb = oc.dot(ray.direction());
-        float c = oc.square() - radius * radius;
-        float d = hb * hb - a * c;
-        if (d < 0.0f) {
+        double a = ray.direction().square();
+        double hb = oc.dot(ray.direction());
+        double c = oc.square() - radius * radius;
+        double d = hb * hb - a * c;
+        if (d < 0.0) {
             return null;
         }
 
-        float sd = sqrt(d);
-        float t = (-hb - sd) / a;
+        double sd = sqrt(d);
+        double t = (-hb - sd) / a;
         if (t < tmin || t > tmax) {
             t = (-hb + sd) / a;
             if (t < tmin || t > tmax) {

@@ -4,11 +4,11 @@ import static com.epeters.raytrace.Utils.scaleInt;
 import static com.epeters.raytrace.Utils.sqrt;
 
 /**
- * Three-dimensional float vector
+ * Three-dimensional double vector
  */
-public record Vector(float x, float y, float z) {
+public record Vector(double x, double y, double z) {
 
-    public static final Vector ORIGIN = new Vector(0.0f, 0.0f, 0.0f);
+    public static final Vector ORIGIN = new Vector(0.0, 0.0, 0.0);
 
     public Vector negate() {
         return new Vector(-x, -y, -z);
@@ -22,23 +22,23 @@ public record Vector(float x, float y, float z) {
         return new Vector(x - other.x, y - other.y, z - other.z);
     }
 
-    public Vector mul(float f) {
+    public Vector mul(double f) {
         return new Vector(x * f, y * f, z * f);
     }
 
-    public float dot(Vector other) {
+    public double dot(Vector other) {
         return x * other.x + y * other.y + z * other.z;
     }
 
-    public float square() {
+    public double square() {
         return dot(this);
     }
 
-    public Vector div(float f) {
+    public Vector div(double f) {
         return new Vector(x / f, y / f, z / f);
     }
 
-    public float mag() {
+    public double mag() {
         return sqrt(square());
     }
 
@@ -58,13 +58,11 @@ public record Vector(float x, float y, float z) {
     }
 
     public Vector randomHemisphericBounce() {
-        while (true) {
-            Vector next = randomOnUnitSphere();
-            if (!isOpposite(next)) {
-                next = next.negate();
-            }
-            return next;
+        Vector next = randomOnUnitSphere();
+        if (!isOpposite(next)) {
+            next = next.negate();
         }
+        return next;
     }
 
     public static Vector randomInUnitSphere() {

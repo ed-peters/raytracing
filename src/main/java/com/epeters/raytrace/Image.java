@@ -89,9 +89,9 @@ public class Image {
         Image image = new Image(256, 256);
         time(() -> {
             image.forEach((x, y) -> {
-                float r = x / 255.0f;
-                float g = y / 255.0f;
-                float b = 0.25f;
+                double r = x / 255.0;
+                double g = y / 255.0;
+                double b = 0.25;
                 image.set(x, y, new Vector(r, g, b));
             });
             image.writePpm("/Users/ed.peters/Desktop/test.ppm");

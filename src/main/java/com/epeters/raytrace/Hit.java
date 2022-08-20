@@ -10,9 +10,9 @@ import java.util.function.Function;
  * @param t the distance along the ray of the point
  * @param front did the ray hit the front of the face?
  */
-public record Hit(Vector point, Vector normal, float t, boolean front) {
+public record Hit(Vector point, Vector normal, double t, boolean front) {
 
-    public static Hit from(Ray ray, float t, Function<Vector,Vector> func) {
+    public static Hit from(Ray ray, double t, Function<Vector,Vector> func) {
         Vector point = ray.at(t);
         Vector normal = func.apply(point).normalize();
         boolean front = ray.direction().isOpposite(normal);
