@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.epeters.raytrace.Utils.BLACK;
+import static com.epeters.raytrace.Utils.DARK_GREEN;
+import static com.epeters.raytrace.Utils.DARK_PINK;
 import static com.epeters.raytrace.Utils.SKY_BLUE;
 import static com.epeters.raytrace.Utils.WHITE;
 import static com.epeters.raytrace.Utils.random;
@@ -102,9 +104,16 @@ public class Tracer {
 
     public static void main(String [] args) {
 
+        Material ground = Material.lambertian(0.8, 0.8, 0.0);
+        Material center = Material.lambertian(0.7, 0.3, 0.3);
+        Material left = Material.metal(0.8, 0.8, 0.8);
+        Material right = Material.metal(0.8, 0.6, 0.2);
+
         List<Solid> world = new ArrayList<>();
-        world.add(new Solid(new Sphere(new Vector(0.0, 0.0, -1.0), 0.5)));
-        world.add(new Solid(new Sphere(new Vector(0.0, -100.5, -1.0), 100.0)));
+        world.add(Solid.sphere(0.0, -100.5, -1.0, 100.0, ground));
+        world.add(Solid.sphere(0.0, 0.0, -1.0, 0.5, center));
+        world.add(Solid.sphere(-1.0, 0.0, -1.0, 0.5, left));
+        world.add(Solid.sphere(1.0, 0.0, -1.0, 0.5, right));
 
         Camera camera = new Camera(ORIGIN);
         Tracer tracer = new Tracer(camera, world);

@@ -16,6 +16,8 @@ public class Utils {
     public static final Vector BLUE = new Vector(0.0, 0.0, 1.0);
     public static final Vector SKY_BLUE = new Vector(0.5, 0.7, 1.0);
     public static final Vector MID_GRAY = new Vector(0.5, 0.5, 0.5);
+    public static final Vector DARK_PINK = new Vector(0.8, 0.0, 0.4);
+    public static final Vector DARK_GREEN = new Vector(0.0, 0.4, 0.0);
 
     private static final Random rand = new Random();
 

@@ -10,16 +10,24 @@ import static com.epeters.raytrace.Utils.MID_GRAY;
  * Hemispherical diffusion - uses a bounce vector located on the unit sphere
  * going away from the object.
  */
-public class HemisphericalMatte implements Material {
+public class HemisphericalMatte extends AbstractColoredMaterial {
+
+    public HemisphericalMatte() {
+        this(MID_GRAY);
+    }
+
+    public HemisphericalMatte(Vector color) {
+        super(color);
+    }
 
     @Override
-    public Bounce computeBounce(Hit hit) {
+    protected Vector computeBounceDirection(Hit hit) {
         Vector hitNormal = hit.normal();
         Vector bounceDirection = hitNormal.plus(randomBounce());
         if (bounceDirection.isOpposite(hitNormal)) {
             bounceDirection = bounceDirection.negate();
         }
-        return new Bounce(MID_GRAY, bounceDirection);
+        return bounceDirection;
     }
 
     private Vector randomBounce() {

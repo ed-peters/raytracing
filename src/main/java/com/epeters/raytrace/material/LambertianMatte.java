@@ -9,13 +9,19 @@ import static com.epeters.raytrace.Utils.MID_GRAY;
 /**
  * Lambertian diffusion - uses a bounce vector located on the unit sphere.
  */
-public class LambertianMatte implements Material {
+public class LambertianMatte extends AbstractColoredMaterial {
+
+    public LambertianMatte() {
+        this(MID_GRAY);
+    }
+
+    public LambertianMatte(Vector color) {
+        super(color);
+    }
 
     @Override
-    public Bounce computeBounce(Hit hit) {
-        Vector hitNormal = hit.normal();
-        Vector bounceDirection = hitNormal.plus(randomBounce());
-        return new Bounce(MID_GRAY, bounceDirection);
+    protected Vector computeBounceDirection(Hit hit) {
+        return hit.normal().plus(randomBounce());
     }
 
     private Vector randomBounce() {
