@@ -5,7 +5,6 @@ import com.epeters.raytrace.Vector;
 
 import static com.epeters.raytrace.Utils.clamp;
 import static com.epeters.raytrace.Utils.randomUnitVector;
-import static com.epeters.raytrace.Vector.vec;
 
 /**
  * Interface for a component that knows how to compute the scattering of light
@@ -23,27 +22,21 @@ public interface Material {
      * Implements "true" Lambertian reflection for a matte material
      * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials/analternativediffuseformulation">guide</a>
      *
-     * @param r attenuation color
-     * @param g attenuation color
-     * @param b attenuation color
+     * @param color attenuation color
      * @return a {@link Material} for calculating scatter parameters
      */
-    static Material lambertian(double r, double g, double b) {
-        final Vector color = vec(r, g, b);
+    static Material lambertian(Vector color) {
         return (hit) -> new Scatter(color, hit.normal().plus(randomUnitVector()));
     }
 
     /**
      * Implements reflection for metal materials with optional fuzzing
      *
-     * @param r attenuation color
-     * @param g attenuation color
-     * @param b attenuation color
+     * @param color attenuation color
      * @param f optional fuzz
      * @return a {@link Material} for calculating scatter parameters
      */
-    static Material metal(double r, double g, double b, double f) {
-        final Vector color = vec(r, g, b);
+    static Material metal(Vector color, double f) {
         final double fuzz = clamp(f, 0.0, 1.0);
         return (hit) -> new Scatter(color, hit.incoming().reflect(hit.normal(), fuzz));
     }

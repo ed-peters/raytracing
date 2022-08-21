@@ -3,7 +3,6 @@ package com.epeters.raytrace;
 import com.epeters.raytrace.material.Scatter;
 import com.epeters.raytrace.material.Material;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.epeters.raytrace.Utils.BLACK;
@@ -12,7 +11,6 @@ import static com.epeters.raytrace.Utils.WHITE;
 import static com.epeters.raytrace.Utils.random;
 import static com.epeters.raytrace.Utils.sqrt;
 import static com.epeters.raytrace.Utils.time;
-import static com.epeters.raytrace.Vector.ORIGIN;
 import static com.epeters.raytrace.Vector.vec;
 
 public class Tracer {
@@ -101,7 +99,7 @@ public class Tracer {
     }
 
     public static void main(String [] args) {
-        Tracer tracer = Scenes.defaultThreeBalls();
+        Tracer tracer = Scenes.closeupSpheres();
         Image image = time(() -> tracer.render(600));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }
