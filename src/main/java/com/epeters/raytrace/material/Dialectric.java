@@ -32,7 +32,8 @@ public class Dialectric implements Material {
         double sin = sqrt(1.0 - cos * cos);
         boolean cannotRefract = ratio * sin > 1.0;
 
-        if (cannotRefract) { // || reflectance(cos, ratio) < random(0.0, 1.0)) {
+        // WTF if we negate the reflectance check, it looks a LOT more like glass
+        if (cannotRefract || reflectance(cos, ratio) > random(0.0, 1.0)) {
             return incoming.reflect(normal, 0.0);
         } else {
             return refract(incoming, normal, cos, ratio);

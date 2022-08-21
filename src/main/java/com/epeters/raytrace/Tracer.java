@@ -110,6 +110,7 @@ public class Tracer {
         List<Solid> world = new ArrayList<>();
         world.add(Solid.sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
         world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), 0.5, left));
+        world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), -0.4, left));
         world.add(Solid.sphere(vec(0.0, 0.0, -1.0), 0.5, center));
         world.add(Solid.sphere(vec(1.0, 0.0, -1.0), 0.5, right));
 
