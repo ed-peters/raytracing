@@ -26,11 +26,11 @@ public class Tracer {
     private final Camera camera;
     private final List<Solid> world;
 
-    public Tracer(Camera camera, List<Solid> world) {
+    public Tracer(CameraSettings settings, List<Solid> world) {
         this.samplesPerPixel = SAMPLES_PER_PIXEL;
         this.bouncesPerPixel = BOUNCES_PER_PIXEL;
         this.sampleScale = 1.0 / samplesPerPixel;
-        this.camera = camera;
+        this.camera = new Camera(settings);
         this.world = world;
     }
 
@@ -101,22 +101,7 @@ public class Tracer {
     }
 
     public static void main(String [] args) {
-
-        Material ground = Material.lambertian(0.8, 0.8, 0.0);
-        Material left = Material.dialectric(1.5);
-        Material center = Material.lambertian(0.1, 0.2, 0.5);
-        Material right = Material.metal(0.8, 0.6, 0.2, 0.0);
-
-        List<Solid> world = new ArrayList<>();
-        world.add(Solid.sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
-        world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), 0.5, left));
-        world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), -0.4, left));
-        world.add(Solid.sphere(vec(0.0, 0.0, -1.0), 0.5, center));
-        world.add(Solid.sphere(vec(1.0, 0.0, -1.0), 0.5, right));
-
-        Camera camera = new Camera(ORIGIN);
-        Tracer tracer = new Tracer(camera, world);
-
+        Tracer tracer = Scenes.defaultThreeBalls();
         Image image = time(() -> tracer.render(600));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }
