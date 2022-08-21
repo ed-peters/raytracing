@@ -47,4 +47,8 @@ public interface Material {
         final double fuzz = clamp(f, 0.0, 1.0);
         return (hit) -> new Scatter(color, hit.incoming().reflect(hit.normal(), fuzz));
     }
+
+    static Material dialectric(double backRatio) {
+        return new Dialectric(backRatio);
+    }
 }

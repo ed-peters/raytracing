@@ -54,6 +54,10 @@ public class Utils {
         return java.lang.Math.sqrt(val);
     }
 
+    public static double square(double val) {
+        return val * val;
+    }
+
     public static void time(Runnable runnable) {
         double start = System.currentTimeMillis();
         runnable.run();
