@@ -1,6 +1,5 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.geometry.Sphere;
 import com.epeters.raytrace.material.Bounce;
 import com.epeters.raytrace.material.Material;
 
@@ -8,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.epeters.raytrace.Utils.BLACK;
-import static com.epeters.raytrace.Utils.DARK_GREEN;
-import static com.epeters.raytrace.Utils.DARK_PINK;
 import static com.epeters.raytrace.Utils.SKY_BLUE;
 import static com.epeters.raytrace.Utils.WHITE;
 import static com.epeters.raytrace.Utils.random;
@@ -44,9 +41,6 @@ public class Tracer {
     public Image render(int imageWidth) {
         Image canvas = new Image(imageWidth, (int)(imageWidth / camera.aspectRatio));
         canvas.forEach((x,y) -> {
-            if (x == 0) {
-                System.err.println("new row: "+y);
-            }
             for (int s=0; s<samplesPerPixel; s++) {
                 Ray ray = computeRay(canvas, x, y);
                 Vector color = computeColor(ray, bouncesPerPixel);
@@ -121,7 +115,7 @@ public class Tracer {
         Camera camera = new Camera(ORIGIN);
         Tracer tracer = new Tracer(camera, world);
 
-        Image image = time(() -> tracer.render(1200));
+        Image image = time(() -> tracer.render(600));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }
 }

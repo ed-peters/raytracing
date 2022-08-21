@@ -2,7 +2,6 @@ package com.epeters.raytrace;
 
 import com.epeters.raytrace.geometry.Geometry;
 import com.epeters.raytrace.geometry.Sphere;
-import com.epeters.raytrace.material.LambertianMatte;
 import com.epeters.raytrace.material.Material;
 
 import java.util.List;
@@ -14,10 +13,6 @@ import java.util.List;
  * @param material the material of the solid
  */
 public record Solid(Geometry geometry, Material material) {
-
-    public Solid(Geometry geometry) {
-        this(geometry, new LambertianMatte());
-    }
 
     public Hit hit(Ray ray, double tmin, double tmax) {
         double t = geometry.hit(ray, tmin, tmax);

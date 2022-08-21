@@ -2,7 +2,6 @@ package com.epeters.raytrace;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Helpers for common simple stuff
@@ -27,6 +26,15 @@ public class Utils {
 
     public static Vector randomVector(double min, double max) {
         return new Vector(random(min, max), random(min, max), random(min, max));
+    }
+
+    public static Vector randomUnitVector() {
+        while (true) {
+            Vector next = randomVector(-1.0, 1.0);
+            if (next.square() < 1.0) {
+                return next.normalize();
+            }
+        }
     }
 
     public static double clamp(double x, double min, double max) {
@@ -62,9 +70,5 @@ public class Utils {
         catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static class Ref<T> extends AtomicReference<T> {
-
     }
 }

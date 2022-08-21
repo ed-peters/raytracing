@@ -12,9 +12,13 @@ package com.epeters.raytrace;
  */
 public record Hit(Ray ray, Solid object, double t, Vector point, Vector normal, boolean front) {
 
+    public Vector incoming() {
+        return ray.direction().normalize();
+    }
+
     public static Hit from(Solid object, Ray ray, double t) {
         Vector point = ray.at(t);
-        Vector normal = object.geometry().computeNormal(point);
+        Vector normal = object.geometry().computeNormal(point).normalize();
         boolean front = ray.direction().isOpposite(normal);
         return new Hit(ray, object, t, point, front ? normal : normal.negate(), front);
     }

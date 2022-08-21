@@ -1,5 +1,6 @@
 package com.epeters.raytrace;
 
+import static com.epeters.raytrace.Utils.randomUnitVector;
 import static com.epeters.raytrace.Utils.scaleInt;
 import static com.epeters.raytrace.Utils.sqrt;
 
@@ -59,5 +60,27 @@ public record Vector(double x, double y, double z) {
                 scaleInt(x, 255),
                 scaleInt(y, 255),
                 scaleInt(z, 255) };
+    }
+
+    /**
+     * @return a random unit vector that bounces "against" this one
+     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials/analternativediffuseformulation">doc</a>
+     */
+    public Vector randomHemisphericReflection() {
+        Vector next = randomUnitVector();
+        return next.isOpposite(this) ? next : next.negate();
+    }
+
+    /**
+     * @return the result of reflecting this vector against the supplied normal, with optional fuzz
+     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/mirroredlightreflection">doc</a>
+     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/fuzzyreflection">doc</a>
+     */
+    public Vector reflect(Vector normal, double fuzz) {
+        Vector result = minus(normal.mul(2.0 * dot(normal)));
+        if (fuzz > 0.0) {
+            result = result.plus(randomUnitVector().mul(fuzz));
+        }
+        return result;
     }
 }
