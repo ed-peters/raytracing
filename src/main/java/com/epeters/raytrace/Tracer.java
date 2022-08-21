@@ -99,7 +99,7 @@ public class Tracer {
     }
 
     public static void main(String [] args) {
-        Tracer tracer = Scenes.closeupSpheres();
+        Tracer tracer = Scenes.farawayThreeBalls();
         Image image = time(() -> tracer.render(600));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }

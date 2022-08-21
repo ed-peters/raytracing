@@ -45,6 +45,16 @@ public class Scenes {
         return new Tracer(settings, world);
     }
 
+    public static Tracer farawayThreeBalls() {
+        CameraSettings settings = new CameraSettings();
+        settings.position = vec(-2.0,2.0,1.0);
+        settings.target = vec(0.0,0.0,-1.0);
+        settings.up = vec(0.0, 1.0, 0.0);
+        settings.fieldOfView = 90.0;
+        settings.aspectRatio = 3.0 / 2.0;
+        return new Tracer(settings, threeBalls());
+
+    }
 
     public static Tracer defaultThreeBalls() {
         return new Tracer(new CameraSettings(), threeBalls());

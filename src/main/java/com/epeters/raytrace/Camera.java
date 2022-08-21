@@ -1,7 +1,5 @@
 package com.epeters.raytrace;
 
-import static com.epeters.raytrace.Vector.vec;
-
 import static java.lang.Math.tan;
 import static java.lang.Math.toRadians;
 
@@ -17,24 +15,23 @@ public class Camera {
     public final Vector horizontal;
     public final Vector vertical;
 
-    public Camera() {
-        this(new CameraSettings());
-    }
-
     public Camera(CameraSettings settings) {
 
         double viewportHeight = 2.0 * tan(toRadians(settings.fieldOfView) / 2.0);
         double viewportWidth = settings.aspectRatio * viewportHeight;
-        Vector focalVector = vec(0.0, 0.0, settings.focalLength);
 
-        this.origin = settings.origin;
+        Vector w = settings.position.minus(settings.target).normalize();
+        Vector u = settings.up.cross(w).normalize();
+        Vector v = w.cross(u);
+
+        this.origin = settings.position;
         this.aspectRatio = settings.aspectRatio;
-        this.horizontal = vec(viewportWidth, 0.0, 0.0);
-        this.vertical = vec(0.0, viewportHeight, 0.0);
+        this.horizontal = u.mul(viewportWidth);
+        this.vertical = v.mul(viewportHeight);
         this.lowerLeft = origin
                 .minus(horizontal.mul(0.5))
                 .minus(vertical.mul(0.5))
-                .minus(focalVector);
+                .minus(w);
     }
 
     public Ray computeRay(double u, double v) {
