@@ -1,7 +1,6 @@
 package com.epeters.raytrace.geometry;
 
-import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.utils.Vector;
 
 /**
  * Interface for an object that knows how to determine whether it's hit by

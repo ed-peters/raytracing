@@ -1,5 +1,6 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.utils.Vector;
 import org.junit.Test;
 
 import java.io.CharArrayWriter;
@@ -9,8 +10,8 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
-import static com.epeters.raytrace.Vector.ORIGIN;
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Vector.ORIGIN;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 public class TestImage {
 

@@ -1,4 +1,7 @@
-package com.epeters.raytrace;
+package com.epeters.raytrace.geometry;
+
+import com.epeters.raytrace.Solid;
+import com.epeters.raytrace.utils.Vector;
 
 /**
  * Represents the intersection of a ray with an object

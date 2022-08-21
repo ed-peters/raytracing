@@ -1,12 +1,12 @@
 package com.epeters.raytrace.material;
 
-import com.epeters.raytrace.Hit;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.geometry.Hit;
+import com.epeters.raytrace.utils.Vector;
 
-import static com.epeters.raytrace.Utils.WHITE;
-import static com.epeters.raytrace.Utils.random;
-import static com.epeters.raytrace.Utils.sqrt;
-import static com.epeters.raytrace.Utils.square;
+import static com.epeters.raytrace.utils.Utils.WHITE;
+import static com.epeters.raytrace.utils.Utils.random;
+import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.square;
 
 import static java.lang.Math.abs;
 

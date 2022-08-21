@@ -1,6 +1,6 @@
 package com.epeters.raytrace.material;
 
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.utils.Vector;
 
 /**
  * Captures the two important facets of light scattering

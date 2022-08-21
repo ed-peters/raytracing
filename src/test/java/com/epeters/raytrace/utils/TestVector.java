@@ -1,13 +1,14 @@
-package com.epeters.raytrace;
+package com.epeters.raytrace.utils;
 
+import com.epeters.raytrace.utils.Vector;
 import org.junit.Test;
 
-import static com.epeters.raytrace.Utils.BLUE;
-import static com.epeters.raytrace.Utils.GREEN;
-import static com.epeters.raytrace.Utils.SKY_BLUE;
-import static com.epeters.raytrace.Utils.WHITE;
-import static com.epeters.raytrace.Utils.RED;
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Utils.BLUE;
+import static com.epeters.raytrace.utils.Utils.GREEN;
+import static com.epeters.raytrace.utils.Utils.SKY_BLUE;
+import static com.epeters.raytrace.utils.Utils.WHITE;
+import static com.epeters.raytrace.utils.Utils.RED;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

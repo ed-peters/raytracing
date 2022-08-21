@@ -1,5 +1,7 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.utils.Vector;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -7,8 +9,8 @@ import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static com.epeters.raytrace.Vector.ORIGIN;
-import static com.epeters.raytrace.Utils.time;
+import static com.epeters.raytrace.utils.Vector.ORIGIN;
+import static com.epeters.raytrace.utils.Utils.time;
 
 /**
  * Interface for a 2D grid of {@link Vector} instances representing colors.

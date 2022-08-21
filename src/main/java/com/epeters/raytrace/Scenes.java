@@ -1,17 +1,18 @@
 package com.epeters.raytrace;
 
 import com.epeters.raytrace.material.Material;
+import com.epeters.raytrace.utils.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epeters.raytrace.Utils.MID_GRAY;
-import static com.epeters.raytrace.Utils.random;
-import static com.epeters.raytrace.Utils.randomVectorInUnitCube;
-import static com.epeters.raytrace.Vector.ORIGIN;
-import static com.epeters.raytrace.Vector.vec;
-import static com.epeters.raytrace.Utils.RED;
-import static com.epeters.raytrace.Utils.BLUE;
+import static com.epeters.raytrace.utils.Utils.MID_GRAY;
+import static com.epeters.raytrace.utils.Utils.random;
+import static com.epeters.raytrace.utils.Utils.randomVectorInUnitCube;
+import static com.epeters.raytrace.utils.Vector.ORIGIN;
+import static com.epeters.raytrace.utils.Vector.vec;
+import static com.epeters.raytrace.utils.Utils.RED;
+import static com.epeters.raytrace.utils.Utils.BLUE;
 import static com.epeters.raytrace.material.Material.lambertian;
 import static com.epeters.raytrace.material.Material.metal;
 import static com.epeters.raytrace.material.Material.dialectric;

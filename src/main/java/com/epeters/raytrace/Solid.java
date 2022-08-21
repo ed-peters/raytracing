@@ -1,8 +1,11 @@
 package com.epeters.raytrace;
 
 import com.epeters.raytrace.geometry.Geometry;
+import com.epeters.raytrace.geometry.Hit;
+import com.epeters.raytrace.geometry.Ray;
 import com.epeters.raytrace.geometry.Sphere;
 import com.epeters.raytrace.material.Material;
+import com.epeters.raytrace.utils.Vector;
 
 import java.util.List;
 

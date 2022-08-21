@@ -1,10 +1,10 @@
 package com.epeters.raytrace.material;
 
-import com.epeters.raytrace.Hit;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.geometry.Hit;
+import com.epeters.raytrace.utils.Vector;
 
-import static com.epeters.raytrace.Utils.clamp;
-import static com.epeters.raytrace.Utils.randomUnitVector;
+import static com.epeters.raytrace.utils.Utils.clamp;
+import static com.epeters.raytrace.utils.Utils.randomUnitVector;
 
 /**
  * Interface for a component that knows how to compute the scattering of light

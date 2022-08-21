@@ -1,17 +1,20 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.geometry.Hit;
+import com.epeters.raytrace.geometry.Ray;
 import com.epeters.raytrace.material.Scatter;
 import com.epeters.raytrace.material.Material;
+import com.epeters.raytrace.utils.Vector;
 
 import java.util.List;
 
-import static com.epeters.raytrace.Utils.BLACK;
-import static com.epeters.raytrace.Utils.SKY_BLUE;
-import static com.epeters.raytrace.Utils.WHITE;
-import static com.epeters.raytrace.Utils.random;
-import static com.epeters.raytrace.Utils.sqrt;
-import static com.epeters.raytrace.Utils.time;
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Utils.BLACK;
+import static com.epeters.raytrace.utils.Utils.SKY_BLUE;
+import static com.epeters.raytrace.utils.Utils.WHITE;
+import static com.epeters.raytrace.utils.Utils.random;
+import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.time;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 public class Tracer {
 

@@ -1,9 +1,8 @@
 package com.epeters.raytrace.geometry;
 
-import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.utils.Vector;
 
-import static com.epeters.raytrace.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.sqrt;
 
 /**
  * Implementation of {@link Geometry} logic for a simple sphere.

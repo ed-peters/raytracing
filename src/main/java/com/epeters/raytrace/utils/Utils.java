@@ -1,9 +1,9 @@
-package com.epeters.raytrace;
+package com.epeters.raytrace.utils;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 /**
  * Helpers for common simple stuff

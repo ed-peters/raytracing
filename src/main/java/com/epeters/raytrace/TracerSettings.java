@@ -1,7 +1,9 @@
 package com.epeters.raytrace;
 
-import static com.epeters.raytrace.Vector.ORIGIN;
-import static com.epeters.raytrace.Vector.vec;
+import com.epeters.raytrace.utils.Vector;
+
+import static com.epeters.raytrace.utils.Vector.ORIGIN;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 public class TracerSettings {
 

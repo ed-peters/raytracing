@@ -1,8 +1,11 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.geometry.Ray;
+import com.epeters.raytrace.utils.Vector;
+
 import static java.lang.Math.tan;
 import static java.lang.Math.toRadians;
-import static com.epeters.raytrace.Utils.randomVectorInUnitDisc;
+import static com.epeters.raytrace.utils.Utils.randomVectorInUnitDisc;
 
 /**
  * Represents the camera in the scene. Knows its position and dimensional info,

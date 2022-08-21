@@ -1,8 +1,8 @@
-package com.epeters.raytrace;
+package com.epeters.raytrace.utils;
 
-import static com.epeters.raytrace.Utils.randomUnitVector;
-import static com.epeters.raytrace.Utils.scaleInt;
-import static com.epeters.raytrace.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.randomUnitVector;
+import static com.epeters.raytrace.utils.Utils.scaleInt;
+import static com.epeters.raytrace.utils.Utils.sqrt;
 
 /**
  * Three-dimensional double vector
