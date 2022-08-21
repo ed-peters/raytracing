@@ -5,9 +5,16 @@ import com.epeters.raytrace.material.Material;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.epeters.raytrace.Utils.MID_GRAY;
+import static com.epeters.raytrace.Utils.random;
+import static com.epeters.raytrace.Utils.randomVectorInUnitCube;
+import static com.epeters.raytrace.Vector.ORIGIN;
 import static com.epeters.raytrace.Vector.vec;
 import static com.epeters.raytrace.Utils.RED;
 import static com.epeters.raytrace.Utils.BLUE;
+import static com.epeters.raytrace.material.Material.lambertian;
+import static com.epeters.raytrace.material.Material.metal;
+import static com.epeters.raytrace.material.Material.dialectric;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 
@@ -15,10 +22,10 @@ public class Scenes {
 
     public static List<Solid> threeBalls() {
 
-        Material ground = Material.lambertian(vec(0.8, 0.8, 0.0));
-        Material left = Material.dialectric(1.5);
-        Material center = Material.lambertian(vec(0.1, 0.2, 0.5));
-        Material right = Material.metal(vec(0.8, 0.6, 0.2), 0.0);
+        Material ground = lambertian(vec(0.8, 0.8, 0.0));
+        Material left = dialectric(1.5);
+        Material center = lambertian(vec(0.1, 0.2, 0.5));
+        Material right = metal(vec(0.8, 0.6, 0.2), 0.0);
 
         List<Solid> world = new ArrayList<>();
         world.add(Solid.sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
@@ -31,8 +38,8 @@ public class Scenes {
 
     public static Tracer closeupSpheres() {
 
-        Material blue = Material.lambertian(BLUE);
-        Material red = Material.lambertian(RED);
+        Material blue = lambertian(BLUE);
+        Material red = lambertian(RED);
 
         double r = cos(PI / 4.0);
         List<Solid> world = new ArrayList<>();
@@ -74,6 +81,53 @@ public class Scenes {
         settings.aperture = 2.0;
         settings.fieldOfView = 20.0;
         return new Tracer(settings, threeBalls());
+    }
+
+    public static Vector randomColor() {
+        return randomVectorInUnitCube().mul(randomVectorInUnitCube());
+    }
+
+    public static Tracer randomWorld() {
+
+        List<Solid> world = new ArrayList<>();
+        world.add(Solid.sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(MID_GRAY)));
+
+        Vector comp = vec(4.0, 0.2, 0.0);
+
+        for (int a=-11; a<11; a++) {
+            for (int b=-11; b<11; b++) {
+
+                Vector center = vec(a + 0.9 * random(), 0.2, b + 0.9 * random());
+                if (center.minus(comp).length() > 0.9) {
+                    double material = random();
+                    if (material < 0.8) {
+                        Vector color = randomColor();
+                        world.add(Solid.sphere(center, 0.2, lambertian(color)));
+                    } else if (material < 0.95) {
+                        Vector color = randomColor();
+                        double fuzz = random(0.0, 0.5);
+                        world.add(Solid.sphere(center, 0.2, metal(color, fuzz)));
+                    } else {
+                        world.add(Solid.sphere(center, 0.2, dialectric(1.5)));
+                    }
+                }
+            }
+        }
+
+        world.add(Solid.sphere(vec(0.0, 1.0, 0.0), 1.0, dialectric(1.5f)));
+        world.add(Solid.sphere(vec(-4.0, 1.0, 0.0), 1.0, lambertian(vec(0.4, 0.2, 0.1))));
+        world.add(Solid.sphere(vec(4.0, 1.0, 0.0), 1.0, metal(vec(0.7, 0.6, 0.5), 0.0)));
+
+        CameraSettings settings = new CameraSettings();
+        settings.aspectRatio = 3.0 / 2.0;
+        settings.position = vec(13.0, 2.0, 3.0);
+        settings.target = ORIGIN;
+        settings.up = vec(0.0, 1.0, 0.0);
+        settings.focalDistance = 10.0;
+        settings.aperture = 0.1;
+        settings.samplesPerPixel = 500;
+        settings.bouncesPerPixel = 50;
+        return new Tracer(settings, world);
     }
 
     public static Tracer defaultThreeBalls() {

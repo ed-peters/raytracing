@@ -15,9 +15,6 @@ import static com.epeters.raytrace.Vector.vec;
 
 public class Tracer {
 
-    public static final int SAMPLES_PER_PIXEL = 100;
-    public static final int BOUNCES_PER_PIXEL = 50;
-
     private final int samplesPerPixel;
     private final int bouncesPerPixel;
     private final double sampleScale;
@@ -26,8 +23,8 @@ public class Tracer {
     private final double aspectRatio;
 
     public Tracer(CameraSettings settings, List<Solid> world) {
-        this.samplesPerPixel = SAMPLES_PER_PIXEL;
-        this.bouncesPerPixel = BOUNCES_PER_PIXEL;
+        this.samplesPerPixel = settings.samplesPerPixel;
+        this.bouncesPerPixel = settings.bouncesPerPixel;
         this.sampleScale = 1.0 / samplesPerPixel;
         this.aspectRatio = settings.aspectRatio;
         this.camera = new Camera(settings);
@@ -42,6 +39,9 @@ public class Tracer {
     public Image render(int imageWidth) {
         Image canvas = new Image(imageWidth, (int)(imageWidth / aspectRatio));
         canvas.forEach((x,y) -> {
+            if (x == 0) {
+                System.err.println("working on row "+y);
+            }
             for (int s=0; s<samplesPerPixel; s++) {
                 Ray ray = computeRay(canvas, x, y);
                 Vector color = computeColor(ray, bouncesPerPixel);
@@ -101,8 +101,8 @@ public class Tracer {
     }
 
     public static void main(String [] args) {
-        Tracer tracer = Scenes.fuzzyThreeBalls();
-        Image image = time(() -> tracer.render(600));
+        Tracer tracer = Scenes.randomWorld();
+        Image image = time(() -> tracer.render(800));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }
 }

@@ -13,4 +13,7 @@ public class CameraSettings {
     public double focalDistance = 1.0;
     public double aperture = 0.0;
 
+    public int samplesPerPixel = 100;
+    public int bouncesPerPixel = 10;
+
 }

@@ -22,17 +22,25 @@ public class Utils {
 
     private static final Random rand = new Random();
 
+    public static double random() {
+        return rand.nextDouble();
+    }
+
     public static double random(double min, double max) {
-        return min + (max - min) * rand.nextDouble();
+        return min + (max - min) * random();
     }
 
     public static Vector randomVector(double min, double max) {
         return vec(random(min, max), random(min, max), random(min, max));
     }
 
+    public static Vector randomVectorInUnitCube() {
+        return randomVector(-1.0, 1.0);
+    }
+
     public static Vector randomUnitVector() {
         while (true) {
-            Vector next = randomVector(-1.0, 1.0);
+            Vector next = randomVectorInUnitCube();
             if (next.square() < 1.0) {
                 return next.normalize();
             }
