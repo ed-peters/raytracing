@@ -39,6 +39,15 @@ public class Utils {
         }
     }
 
+    public static Vector randomVectorInUnitDisc() {
+        while (true) {
+            Vector next = vec(random(-1.0, 1.0), random(-1.0, 1.0), 0.0);
+            if (next.square() < 1.0) {
+                return next;
+            }
+        }
+    }
+
     public static double clamp(double x, double min, double max) {
         if (x < min) {
             return min;

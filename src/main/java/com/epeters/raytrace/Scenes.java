@@ -65,6 +65,17 @@ public class Scenes {
         return new Tracer(settings, threeBalls());
     }
 
+    public static Tracer fuzzyThreeBalls() {
+        CameraSettings settings = new CameraSettings();
+        settings.position = vec(3.0, 3.0, 2.0);
+        settings.target = vec(0.0, 0.0, -1.0);
+        settings.up = vec(0.0, 1.0, 0.0);
+        settings.focalDistance = settings.position.minus(settings.target).length();
+        settings.aperture = 2.0;
+        settings.fieldOfView = 20.0;
+        return new Tracer(settings, threeBalls());
+    }
+
     public static Tracer defaultThreeBalls() {
         return new Tracer(new CameraSettings(), threeBalls());
     }

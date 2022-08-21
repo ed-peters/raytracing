@@ -46,6 +46,10 @@ public record Vector(double x, double y, double z) {
         return dot(this);
     }
 
+    public double length() {
+        return sqrt(square());
+    }
+
     public Vector div(double f) {
         return new Vector(x / f, y / f, z / f);
     }

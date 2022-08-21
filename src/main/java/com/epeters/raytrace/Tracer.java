@@ -23,11 +23,13 @@ public class Tracer {
     private final double sampleScale;
     private final Camera camera;
     private final List<Solid> world;
+    private final double aspectRatio;
 
     public Tracer(CameraSettings settings, List<Solid> world) {
         this.samplesPerPixel = SAMPLES_PER_PIXEL;
         this.bouncesPerPixel = BOUNCES_PER_PIXEL;
         this.sampleScale = 1.0 / samplesPerPixel;
+        this.aspectRatio = settings.aspectRatio;
         this.camera = new Camera(settings);
         this.world = world;
     }
@@ -38,7 +40,7 @@ public class Tracer {
      * scale/correct the resulting color value.
      */
     public Image render(int imageWidth) {
-        Image canvas = new Image(imageWidth, (int)(imageWidth / camera.aspectRatio));
+        Image canvas = new Image(imageWidth, (int)(imageWidth / aspectRatio));
         canvas.forEach((x,y) -> {
             for (int s=0; s<samplesPerPixel; s++) {
                 Ray ray = computeRay(canvas, x, y);
@@ -99,7 +101,7 @@ public class Tracer {
     }
 
     public static void main(String [] args) {
-        Tracer tracer = Scenes.closeupThreeBalls();
+        Tracer tracer = Scenes.fuzzyThreeBalls();
         Image image = time(() -> tracer.render(600));
         image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
     }
