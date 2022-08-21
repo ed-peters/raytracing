@@ -3,20 +3,22 @@ package com.epeters.raytrace;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
+import static com.epeters.raytrace.Vector.vec;
+
 /**
  * Helpers for common simple stuff
  */
 public class Utils {
 
-    public static final Vector RED = new Vector(1.0, 0.0, 0.0);
+    public static final Vector RED = vec(1.0, 0.0, 0.0);
     public static final Vector BLACK = Vector.ORIGIN;
-    public static final Vector WHITE = new Vector(1.0, 1.0, 1.0);
-    public static final Vector GREEN = new Vector(0.0, 1.0, 0.0);
-    public static final Vector BLUE = new Vector(0.0, 0.0, 1.0);
-    public static final Vector SKY_BLUE = new Vector(0.5, 0.7, 1.0);
-    public static final Vector MID_GRAY = new Vector(0.5, 0.5, 0.5);
-    public static final Vector DARK_PINK = new Vector(0.8, 0.0, 0.4);
-    public static final Vector DARK_GREEN = new Vector(0.0, 0.4, 0.0);
+    public static final Vector WHITE = vec(1.0, 1.0, 1.0);
+    public static final Vector GREEN = vec(0.0, 1.0, 0.0);
+    public static final Vector BLUE = vec(0.0, 0.0, 1.0);
+    public static final Vector SKY_BLUE = vec(0.5, 0.7, 1.0);
+    public static final Vector MID_GRAY = vec(0.5, 0.5, 0.5);
+    public static final Vector DARK_PINK = vec(0.8, 0.0, 0.4);
+    public static final Vector DARK_GREEN = vec(0.0, 0.4, 0.0);
 
     private static final Random rand = new Random();
 
@@ -25,7 +27,7 @@ public class Utils {
     }
 
     public static Vector randomVector(double min, double max) {
-        return new Vector(random(min, max), random(min, max), random(min, max));
+        return vec(random(min, max), random(min, max), random(min, max));
     }
 
     public static Vector randomUnitVector() {

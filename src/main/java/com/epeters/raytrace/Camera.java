@@ -1,5 +1,7 @@
 package com.epeters.raytrace;
 
+import static com.epeters.raytrace.Vector.vec;
+
 /**
  * Represents the camera in the scene. Knows its position and dimensional info,
  * and how to calculate a ray through the focal image.
@@ -23,12 +25,12 @@ public class Camera {
     public Camera(Vector origin, double viewportHeight, double aspectRatio, double focalLength) {
 
         double viewportWidth = aspectRatio * viewportHeight;
-        Vector focalVector = new Vector(0.0, 0.0, focalLength);
+        Vector focalVector = vec(0.0, 0.0, focalLength);
 
         this.origin = origin;
         this.aspectRatio = aspectRatio;
-        this.horizontal = new Vector(viewportWidth, 0.0, 0.0);
-        this.vertical = new Vector(0.0, viewportHeight, 0.0);
+        this.horizontal = vec(viewportWidth, 0.0, 0.0);
+        this.vertical = vec(0.0, viewportHeight, 0.0);
         this.lowerLeft = origin
                 .minus(horizontal.mul(0.5))
                 .minus(vertical.mul(0.5))

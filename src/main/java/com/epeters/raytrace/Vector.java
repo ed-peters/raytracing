@@ -83,4 +83,8 @@ public record Vector(double x, double y, double z) {
         }
         return result;
     }
+
+    public static Vector vec(double x, double y, double z) {
+        return new Vector(x, y, z);
+    }
 }

@@ -10,6 +10,7 @@ import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
 
 public class TestImage {
 
@@ -20,12 +21,12 @@ public class TestImage {
         assertEquals(ORIGIN, image.get(0, 0));
         assertEquals(ORIGIN, image.get(1, 1));
 
-        Vector oneX = new Vector(1.0f, 0.0f, 0.0f);
+        Vector oneX = vec(1.0f, 0.0f, 0.0f);
         image.update(0, 0, val -> val.plus(oneX));
         image.update(0, 0, val -> val.plus(oneX));
         image.update(0, 0, val -> val.plus(oneX));
         image.update(0, 0, val -> val.plus(oneX));
-        assertEquals(new Vector(4.0f, 0.0f, 0.0f), image.get(0, 0));
+        assertEquals(vec(4.0f, 0.0f, 0.0f), image.get(0, 0));
         assertEquals(ORIGIN, image.get(1, 1));
     }
 
@@ -43,7 +44,7 @@ public class TestImage {
             float r = x / 255.0f;
             float g = y / 255.0f;
             float b = 0.25f;
-            image.set(x, y, new Vector(r, g, b));
+            image.set(x, y, vec(r, g, b));
         });
 
         StringWriter writer = new StringWriter();

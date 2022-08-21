@@ -14,11 +14,20 @@ import java.util.List;
  */
 public record Solid(Geometry geometry, Material material) {
 
+    /**
+     * @param ray a ray of interest
+     * @param tmin minimum hit distance
+     * @param tmax maximum hit distance
+     * @return a {@link Hit} calculated using the underlying geometry (null if this is a miss)
+     */
     public Hit hit(Ray ray, double tmin, double tmax) {
         double t = geometry.hit(ray, tmin, tmax);
         return Double.isNaN(t) ? null : Hit.from(this, ray, t);
     }
 
+    /**
+     * @return the closest hit among the specified solids (null if this is a miss)
+     */
     static Hit computeHit(List<Solid> solids, Ray ray) {
         double tmin = 0.000001f;
         double tcur = Double.MAX_VALUE;
@@ -33,7 +42,10 @@ public record Solid(Geometry geometry, Material material) {
         return best;
     }
 
-    static Solid sphere(double cx, double cy, double cz, double radius, Material material) {
-        return new Solid(new Sphere(new Vector(cx, cy, cz), radius), material);
+    /**
+     * @return a spherical solid with the supplied properties
+     */
+    static Solid sphere(Vector center, double radius, Material material) {
+        return new Solid(new Sphere(center, radius), material);
     }
 }

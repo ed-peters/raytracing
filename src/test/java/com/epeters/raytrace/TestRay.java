@@ -4,33 +4,25 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
 
 public class TestRay {
 
     @Test
     public void testAtAlongAxis() {
-        Ray ray = new Ray(ORIGIN, new Vector(1.0f, 0.0f, 0.0f));
-        assertEquals(new Vector(-2.0f, 0.0f, 0.0f), ray.at(-2.0f));
-        assertEquals(new Vector(0.5f, 0.0f, 0.0f), ray.at(0.5f));
-        assertEquals(ORIGIN, ray.at(0.0f));
-        assertEquals(new Vector(2.0f, 0.0f, 0.0f), ray.at(2.0f));
+        Ray ray = new Ray(ORIGIN, vec(1.0, 0.0, 0.0));
+        assertEquals(vec(-2.0, 0.0, 0.0), ray.at(-2.0));
+        assertEquals(vec(0.5, 0.0, 0.0), ray.at(0.5));
+        assertEquals(ORIGIN, ray.at(0.0));
+        assertEquals(vec(2.0, 0.0, 0.0), ray.at(2.0));
     }
 
     @Test
     public void testAtWithAngle() {
-        Ray ray = new Ray(ORIGIN, new Vector(1.0f, 2.0f, 3.0f));
-        assertEquals(new Vector(-2.0f, -4.0f, -6.0f), ray.at(-2.0f));
-        assertEquals(new Vector(0.5f, 1.0f, 1.5f), ray.at(0.5f));
-        assertEquals(ORIGIN, ray.at(0.0f));
-        assertEquals(new Vector(2.0f, 4.0f, 6.0f), ray.at(2.0f));
-    }
-
-    @Test
-    public void testAtWithAngleAndOffset() {
-        Ray ray = new Ray(new Vector(1.0f, 2.0f, 3.0f), new Vector(1.0f, 2.0f, 3.0f));
-        assertEquals(new Vector(-1.0f, -2.0f, -3.0f), ray.at(-2.0f));
-        assertEquals(new Vector(1.5f, 3.0f, 4.5f), ray.at(0.5f));
-        assertEquals(new Vector(1.0f, 2.0f, 3.0f), ray.at(0.0f));
-        assertEquals(new Vector(3.0f, 6.0f, 9.0f), ray.at(2.0f));
+        Ray ray = new Ray(ORIGIN, vec(1.0, 2.0, 3.0));
+        assertEquals(vec(-2.0, -4.0, -6.0), ray.at(-7.483314773547883));
+        assertEquals(vec(0.5, 1.0, 1.5), ray.at(1.8708286933869707));
+        assertEquals(ORIGIN, ray.at(0.0));
+        assertEquals(vec(2.0, 4.0, 6.0), ray.at(7.483314773547883));
     }
 }

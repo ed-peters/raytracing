@@ -1,6 +1,6 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.material.Bounce;
+import com.epeters.raytrace.material.Scatter;
 import com.epeters.raytrace.material.Material;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import static com.epeters.raytrace.Utils.random;
 import static com.epeters.raytrace.Utils.sqrt;
 import static com.epeters.raytrace.Utils.time;
 import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
 
 public class Tracer {
 
@@ -50,7 +51,7 @@ public class Tracer {
                 double newX = sqrt(value.x() * sampleScale);
                 double newY = sqrt(value.y() * sampleScale);
                 double newZ = sqrt(value.z() * sampleScale);
-                return new Vector(newX, newY, newZ);
+                return vec(newX, newY, newZ);
             });
         });
         return canvas;
@@ -83,9 +84,9 @@ public class Tracer {
             return defaultColor(hit);
         }
 
-        Bounce bounce = material.computeBounce(hit);
-        Ray bounceRay = new Ray(hit.point(), bounce.direction());
-        return bounce.albedo().mul(computeColor(bounceRay, bouncesRemaining-1));
+        Scatter scatter = material.computeScatter(hit);
+        Ray bounceRay = new Ray(hit.point(), scatter.direction());
+        return scatter.attenuation().mul(computeColor(bounceRay, bouncesRemaining-1));
     }
 
     /** Computes the background color for the specified ray */
@@ -107,10 +108,10 @@ public class Tracer {
         Material right = Material.metal(0.8, 0.6, 0.2, 1.0);
 
         List<Solid> world = new ArrayList<>();
-        world.add(Solid.sphere(0.0, -100.5, -1.0, 100.0, ground));
-        world.add(Solid.sphere(-1.0, 0.0, -1.0, 0.5, center));
-        world.add(Solid.sphere(0.0, 0.0, -1.0, 0.5, left));
-        world.add(Solid.sphere(1.0, 0.0, -1.0, 0.5, right));
+        world.add(Solid.sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
+        world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), 0.5, center));
+        world.add(Solid.sphere(vec(0.0, 0.0, -1.0), 0.5, left));
+        world.add(Solid.sphere(vec(1.0, 0.0, -1.0), 0.5, right));
 
         Camera camera = new Camera(ORIGIN);
         Tracer tracer = new Tracer(camera, world);
