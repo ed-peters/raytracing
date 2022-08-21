@@ -84,6 +84,14 @@ public class TestVector {
         assetApproximatelyEqual(exp, a.normalize());
     }
 
+    @Test
+    public void testCross() {
+        Vector l = vec(3.0, -3.0, 1.0);
+        Vector r = vec(4.0, 9.0, 2.0);
+        Vector expected = vec(-15.0, -2.0, 39.0);
+        assertEquals(expected, l.cross(r));
+    }
+
     private void assetApproximatelyEqual(Vector expected, Vector actual) {
         assertEquals(expected.x(), actual.x(), 1e-6);
         assertEquals(expected.y(), actual.y(), 1e-6);

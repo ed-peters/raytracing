@@ -31,6 +31,13 @@ public record Vector(double x, double y, double z) {
         return new Vector(x * f, y * f, z * f);
     }
 
+    public Vector cross(Vector other) {
+        double x = y() * other.z() - z() * other.y();
+        double y = z() * other.x() - x() * other.z();
+        double z = x() * other.y() - y() * other.x();
+        return vec(x, y, z);
+    }
+
     public double dot(Vector other) {
         return x * other.x + y * other.y + z * other.z;
     }
