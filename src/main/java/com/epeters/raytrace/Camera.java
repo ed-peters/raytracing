@@ -19,7 +19,7 @@ public class Camera {
     private final Vector v;
     private final Vector w;
 
-    public Camera(CameraSettings settings) {
+    public Camera(TracerSettings settings) {
 
         double viewportHeight = 2.0 * tan(toRadians(settings.fieldOfView) / 2.0);
         double viewportWidth = settings.aspectRatio * viewportHeight;

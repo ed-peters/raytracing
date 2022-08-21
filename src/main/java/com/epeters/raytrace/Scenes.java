@@ -15,6 +15,7 @@ import static com.epeters.raytrace.Utils.BLUE;
 import static com.epeters.raytrace.material.Material.lambertian;
 import static com.epeters.raytrace.material.Material.metal;
 import static com.epeters.raytrace.material.Material.dialectric;
+import static com.epeters.raytrace.Solid.sphere;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 
@@ -28,11 +29,11 @@ public class Scenes {
         Material right = metal(vec(0.8, 0.6, 0.2), 0.0);
 
         List<Solid> world = new ArrayList<>();
-        world.add(Solid.sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
-        world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), 0.5, left));
-        world.add(Solid.sphere(vec(-1.0, 0.0, -1.0), -0.4, left));
-        world.add(Solid.sphere(vec(0.0, 0.0, -1.0), 0.5, center));
-        world.add(Solid.sphere(vec(1.0, 0.0, -1.0), 0.5, right));
+        world.add(sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
+        world.add(sphere(vec(-1.0, 0.0, -1.0), 0.5, left));
+        world.add(sphere(vec(-1.0, 0.0, -1.0), -0.4, left));
+        world.add(sphere(vec(0.0, 0.0, -1.0), 0.5, center));
+        world.add(sphere(vec(1.0, 0.0, -1.0), 0.5, right));
         return world;
     }
 
@@ -43,17 +44,17 @@ public class Scenes {
 
         double r = cos(PI / 4.0);
         List<Solid> world = new ArrayList<>();
-        world.add(Solid.sphere(vec(-r, 0.0, -1.0), r, blue));
-        world.add(Solid.sphere(vec(r, 0.0, -1.0), r, red));
+        world.add(sphere(vec(-r, 0.0, -1.0), r, blue));
+        world.add(sphere(vec(r, 0.0, -1.0), r, red));
 
-        CameraSettings settings = new CameraSettings();
+        TracerSettings settings = new TracerSettings();
         settings.fieldOfView = 90.0;
         settings.aspectRatio = 3.0 / 2.0;
         return new Tracer(settings, world);
     }
 
     public static Tracer farawayThreeBalls() {
-        CameraSettings settings = new CameraSettings();
+        TracerSettings settings = new TracerSettings();
         settings.position = vec(-2.0,2.0,1.0);
         settings.target = vec(0.0,0.0,-1.0);
         settings.up = vec(0.0, 1.0, 0.0);
@@ -63,7 +64,7 @@ public class Scenes {
     }
 
     public static Tracer closeupThreeBalls() {
-        CameraSettings settings = new CameraSettings();
+        TracerSettings settings = new TracerSettings();
         settings.position = vec(-2.0,2.0,1.0);
         settings.target = vec(0.0,0.0,-1.0);
         settings.up = vec(0.0, 1.0, 0.0);
@@ -73,7 +74,7 @@ public class Scenes {
     }
 
     public static Tracer fuzzyThreeBalls() {
-        CameraSettings settings = new CameraSettings();
+        TracerSettings settings = new TracerSettings();
         settings.position = vec(3.0, 3.0, 2.0);
         settings.target = vec(0.0, 0.0, -1.0);
         settings.up = vec(0.0, 1.0, 0.0);
@@ -90,7 +91,7 @@ public class Scenes {
     public static Tracer randomWorld() {
 
         List<Solid> world = new ArrayList<>();
-        world.add(Solid.sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(MID_GRAY)));
+        world.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(MID_GRAY)));
 
         Vector comp = vec(4.0, 0.2, 0.0);
 
@@ -102,23 +103,23 @@ public class Scenes {
                     double material = random();
                     if (material < 0.8) {
                         Vector color = randomColor();
-                        world.add(Solid.sphere(center, 0.2, lambertian(color)));
+                        world.add(sphere(center, 0.2, lambertian(color)));
                     } else if (material < 0.95) {
                         Vector color = randomColor();
                         double fuzz = random(0.0, 0.5);
-                        world.add(Solid.sphere(center, 0.2, metal(color, fuzz)));
+                        world.add(sphere(center, 0.2, metal(color, fuzz)));
                     } else {
-                        world.add(Solid.sphere(center, 0.2, dialectric(1.5)));
+                        world.add(sphere(center, 0.2, dialectric(1.5)));
                     }
                 }
             }
         }
 
-        world.add(Solid.sphere(vec(0.0, 1.0, 0.0), 1.0, dialectric(1.5f)));
-        world.add(Solid.sphere(vec(-4.0, 1.0, 0.0), 1.0, lambertian(vec(0.4, 0.2, 0.1))));
-        world.add(Solid.sphere(vec(4.0, 1.0, 0.0), 1.0, metal(vec(0.7, 0.6, 0.5), 0.0)));
+        world.add(sphere(vec(0.0, 1.0, 0.0), 1.0, dialectric(1.5f)));
+        world.add(sphere(vec(-4.0, 1.0, 0.0), 1.0, lambertian(vec(0.4, 0.2, 0.1))));
+        world.add(sphere(vec(4.0, 1.0, 0.0), 1.0, metal(vec(0.7, 0.6, 0.5), 0.0)));
 
-        CameraSettings settings = new CameraSettings();
+        TracerSettings settings = new TracerSettings();
         settings.aspectRatio = 3.0 / 2.0;
         settings.position = vec(13.0, 2.0, 3.0);
         settings.target = ORIGIN;
@@ -131,6 +132,6 @@ public class Scenes {
     }
 
     public static Tracer defaultThreeBalls() {
-        return new Tracer(new CameraSettings(), threeBalls());
+        return new Tracer(new TracerSettings(), threeBalls());
     }
 }

@@ -3,7 +3,7 @@ package com.epeters.raytrace;
 import static com.epeters.raytrace.Vector.ORIGIN;
 import static com.epeters.raytrace.Vector.vec;
 
-public class CameraSettings {
+public class TracerSettings {
 
     public Vector position = ORIGIN;
     public Vector target = vec(0.0, 0.0, -1.0);

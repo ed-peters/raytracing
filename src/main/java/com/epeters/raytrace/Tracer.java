@@ -22,7 +22,7 @@ public class Tracer {
     private final List<Solid> world;
     private final double aspectRatio;
 
-    public Tracer(CameraSettings settings, List<Solid> world) {
+    public Tracer(TracerSettings settings, List<Solid> world) {
         this.samplesPerPixel = settings.samplesPerPixel;
         this.bouncesPerPixel = settings.bouncesPerPixel;
         this.sampleScale = 1.0 / samplesPerPixel;
