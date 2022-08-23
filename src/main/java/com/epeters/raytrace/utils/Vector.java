@@ -11,6 +11,15 @@ public record Vector(double x, double y, double z) {
 
     public static final Vector ORIGIN = new Vector(0.0, 0.0, 0.0);
 
+    public double component(int which) {
+        return switch (which) {
+            case 0 -> x();
+            case 1 -> y();
+            case 2 -> z();
+            default -> throw new IllegalArgumentException("unknown component "+which);
+        };
+    }
+
     public Vector negate() {
         return new Vector(-x, -y, -z);
     }

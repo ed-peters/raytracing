@@ -1,9 +1,10 @@
-package com.epeters.raytrace.material;
+package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.utils.Vector;
 
 /**
  * Captures the two important facets of light scattering
+ *
  * @param attenuation the color attenuation (darker means light is absorbed)
  * @param direction the direction of the scatter
  */

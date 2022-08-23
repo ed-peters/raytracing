@@ -1,11 +1,10 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.material.Material;
+import com.epeters.raytrace.rendering.RendererConfig;
+import com.epeters.raytrace.solids.Material;
 import com.epeters.raytrace.utils.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static com.epeters.raytrace.solids.Solid.movingSphere;
 import static com.epeters.raytrace.utils.Utils.MID_GRAY;
 import static com.epeters.raytrace.utils.Utils.random;
 import static com.epeters.raytrace.utils.Utils.randomVectorInUnitCube;
@@ -13,86 +12,77 @@ import static com.epeters.raytrace.utils.Vector.ORIGIN;
 import static com.epeters.raytrace.utils.Vector.vec;
 import static com.epeters.raytrace.utils.Utils.RED;
 import static com.epeters.raytrace.utils.Utils.BLUE;
-import static com.epeters.raytrace.material.Material.lambertian;
-import static com.epeters.raytrace.material.Material.metal;
-import static com.epeters.raytrace.material.Material.dialectric;
-import static com.epeters.raytrace.Solid.sphere;
+import static com.epeters.raytrace.solids.Material.lambertian;
+import static com.epeters.raytrace.solids.Material.metal;
+import static com.epeters.raytrace.solids.Material.dialectric;
+import static com.epeters.raytrace.solids.Solid.sphere;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 
 public class Scenes {
 
-    public static List<Solid> threeBalls() {
+    public static RendererConfig threeBalls() {
 
         Material ground = lambertian(vec(0.8, 0.8, 0.0));
         Material left = dialectric(1.5);
         Material center = lambertian(vec(0.1, 0.2, 0.5));
         Material right = metal(vec(0.8, 0.6, 0.2), 0.0);
 
-        List<Solid> world = new ArrayList<>();
-        world.add(sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
-        world.add(sphere(vec(-1.0, 0.0, -1.0), 0.5, left));
-        world.add(sphere(vec(-1.0, 0.0, -1.0), -0.4, left));
-        world.add(sphere(vec(0.0, 0.0, -1.0), 0.5, center));
-        world.add(sphere(vec(1.0, 0.0, -1.0), 0.5, right));
-        return world;
+        RendererConfig config = new RendererConfig();
+        config.add(sphere(ground, vec(0.0, -100.5, -1.0), 100.0));
+        config.add(sphere(left, vec(-1.0, 0.0, -1.0), 0.5));
+        config.add(sphere(left, vec(-1.0, 0.0, -1.0), -0.4));
+        config.add(sphere(center, vec(0.0, 0.0, -1.0), 0.5));
+        config.add(sphere(right, vec(1.0, 0.0, -1.0), 0.5));
+        return config;
     }
 
-    public static Tracer closeupSpheres() {
-
-        Material blue = lambertian(BLUE);
-        Material red = lambertian(RED);
-
+    public static RendererConfig closeupSpheres() {
         double r = cos(PI / 4.0);
-        List<Solid> world = new ArrayList<>();
-        world.add(sphere(vec(-r, 0.0, -1.0), r, blue));
-        world.add(sphere(vec(r, 0.0, -1.0), r, red));
-
-        TracerSettings settings = new TracerSettings();
-        settings.fieldOfView = 90.0;
-        settings.aspectRatio = 3.0 / 2.0;
-        return new Tracer(settings, world);
+        RendererConfig config = new RendererConfig();
+        config.add(sphere(lambertian(BLUE), vec(-r, 0.0, -1.0), r));
+        config.add(sphere(lambertian(RED), vec(r, 0.0, -1.0), r));
+        config.fieldOfView = 90.0;
+        config.aspectRatio = 3.0 / 2.0;
+        return config;
     }
 
-    public static Tracer farawayThreeBalls() {
-        TracerSettings settings = new TracerSettings();
-        settings.position = vec(-2.0,2.0,1.0);
-        settings.target = vec(0.0,0.0,-1.0);
-        settings.up = vec(0.0, 1.0, 0.0);
-        settings.fieldOfView = 90.0;
-        settings.aspectRatio = 3.0 / 2.0;
-        return new Tracer(settings, threeBalls());
+    public static RendererConfig farawayThreeBalls() {
+        RendererConfig config = threeBalls();
+        config.position = vec(-2.0,2.0,1.0);
+        config.target = vec(0.0,0.0,-1.0);
+        config.up = vec(0.0, 1.0, 0.0);
+        config.fieldOfView = 90.0;
+        config.aspectRatio = 3.0 / 2.0;
+        return config;
     }
 
-    public static Tracer closeupThreeBalls() {
-        TracerSettings settings = new TracerSettings();
-        settings.position = vec(-2.0,2.0,1.0);
-        settings.target = vec(0.0,0.0,-1.0);
-        settings.up = vec(0.0, 1.0, 0.0);
-        settings.fieldOfView = 20;
-        settings.aspectRatio = 3.0 / 2.0;
-        return new Tracer(settings, threeBalls());
+    public static RendererConfig closeupThreeBalls() {
+        RendererConfig config = threeBalls();
+        config.position = vec(-2.0,2.0,1.0);
+        config.target = vec(0.0,0.0,-1.0);
+        config.up = vec(0.0, 1.0, 0.0);
+        config.fieldOfView = 20;
+        config.aspectRatio = 3.0 / 2.0;
+        return config;
     }
 
-    public static Tracer fuzzyThreeBalls() {
-        TracerSettings settings = new TracerSettings();
-        settings.position = vec(3.0, 3.0, 2.0);
-        settings.target = vec(0.0, 0.0, -1.0);
-        settings.up = vec(0.0, 1.0, 0.0);
-        settings.focalDistance = settings.position.minus(settings.target).length();
-        settings.aperture = 2.0;
-        settings.fieldOfView = 20.0;
-        return new Tracer(settings, threeBalls());
+    public static RendererConfig fuzzyThreeBalls() {
+        RendererConfig config = threeBalls();
+        config.position = vec(3.0, 3.0, 2.0);
+        config.target = vec(0.0, 0.0, -1.0);
+        config.up = vec(0.0, 1.0, 0.0);
+        config.aperture = 2.0;
+        config.fieldOfView = 20.0;
+        return config;
     }
 
-    public static Vector randomColor() {
-        return randomVectorInUnitCube().mul(randomVectorInUnitCube());
-    }
+    public static RendererConfig randomWorld(boolean motionBlur) {
 
-    public static Tracer randomWorld() {
+        RendererConfig config = new RendererConfig();
+        config.motionBlur = motionBlur;
 
-        List<Solid> world = new ArrayList<>();
-        world.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(MID_GRAY)));
+        config.add(sphere(lambertian(MID_GRAY), vec(0.0, -1000.0, 0.0), 1000.0));
 
         Vector comp = vec(4.0, 0.2, 0.0);
 
@@ -104,35 +94,38 @@ public class Scenes {
                     double material = random();
                     if (material < 0.8) {
                         Vector color = randomColor();
-                        world.add(sphere(center, 0.2, lambertian(color)));
+                        if (motionBlur) {
+                            Vector centerEnd = center.plus(vec(0.0, random(0.0, 0.5), 0.0));
+                            config.add(movingSphere(lambertian(color), center, centerEnd, 0.2));
+                        } else {
+                            config.add(sphere(lambertian(color), center, 0.2));
+                        }
                     } else if (material < 0.95) {
                         Vector color = randomColor();
                         double fuzz = random(0.0, 0.5);
-                        world.add(sphere(center, 0.2, metal(color, fuzz)));
+                        config.add(sphere(metal(color, fuzz), center, 0.2));
                     } else {
-                        world.add(sphere(center, 0.2, dialectric(1.5)));
+                        config.add(sphere(dialectric(1.5), center, 0.2));
                     }
                 }
             }
         }
 
-        world.add(sphere(vec(0.0, 1.0, 0.0), 1.0, dialectric(1.5f)));
-        world.add(sphere(vec(-4.0, 1.0, 0.0), 1.0, lambertian(vec(0.4, 0.2, 0.1))));
-        world.add(sphere(vec(4.0, 1.0, 0.0), 1.0, metal(vec(0.7, 0.6, 0.5), 0.0)));
-
-        TracerSettings settings = new TracerSettings();
-        settings.aspectRatio = 3.0 / 2.0;
-        settings.position = vec(13.0, 2.0, 3.0);
-        settings.target = ORIGIN;
-        settings.up = vec(0.0, 1.0, 0.0);
-        settings.focalDistance = 10.0;
-        settings.aperture = 0.1;
-        settings.samplesPerPixel = 500;
-        settings.bouncesPerPixel = 50;
-        return new Tracer(settings, world);
+        config.add(sphere(dialectric(1.5f), vec(0.0, 1.0, 0.0), 1.0));
+        config.add(sphere(lambertian(vec(0.4, 0.2, 0.1)), vec(-4.0, 1.0, 0.0), 1.0));
+        config.add(sphere(metal(vec(0.7, 0.6, 0.5), 0.0), vec(4.0, 1.0, 0.0), 1.0));
+        config.aspectRatio = 3.0 / 2.0;
+        config.position = vec(13.0, 2.0, 3.0);
+        config.target = ORIGIN;
+        config.up = vec(0.0, 1.0, 0.0);
+        config.focalDistance = 10.0;
+        config.aperture = 0.1;
+        config.samplesPerPixel = 500;
+        config.bouncesPerPixel = 50;
+        return config;
     }
 
-    public static Tracer defaultThreeBalls() {
-        return new Tracer(new TracerSettings(), threeBalls());
+    public static Vector randomColor() {
+        return randomVectorInUnitCube().mul(randomVectorInUnitCube());
     }
 }

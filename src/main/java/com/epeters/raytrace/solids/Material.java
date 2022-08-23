@@ -1,6 +1,6 @@
-package com.epeters.raytrace.material;
+package com.epeters.raytrace.solids;
 
-import com.epeters.raytrace.geometry.Hit;
+import com.epeters.raytrace.hitting.Hit;
 import com.epeters.raytrace.utils.Vector;
 
 import static com.epeters.raytrace.utils.Utils.clamp;
@@ -38,10 +38,13 @@ public interface Material {
      */
     static Material metal(Vector color, double f) {
         final double fuzz = clamp(f, 0.0, 1.0);
-        return (hit) -> new Scatter(color, hit.incoming().reflect(hit.normal(), fuzz));
+        return (hit) -> new Scatter(color, hit.ray().direction().reflect(hit.normal(), fuzz));
     }
 
+    /**
+     * {@link DialectricMaterial}
+     */
     static Material dialectric(double backRatio) {
-        return new Dialectric(backRatio);
+        return new DialectricMaterial(backRatio);
     }
 }
