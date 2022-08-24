@@ -26,19 +26,18 @@ public interface Material {
      * @return a {@link Material} for calculating scatter parameters
      */
     static Material lambertian(Vector color) {
-        return (hit) -> new Scatter(color, hit.normal().plus(randomUnitVector()));
+        return new LambertianMaterial(color);
     }
 
     /**
      * Implements reflection for metal materials with optional fuzzing
      *
      * @param color attenuation color
-     * @param f optional fuzz
+     * @param fuzz optional fuzz
      * @return a {@link Material} for calculating scatter parameters
      */
-    static Material metal(Vector color, double f) {
-        final double fuzz = clamp(f, 0.0, 1.0);
-        return (hit) -> new Scatter(color, hit.ray().direction().reflect(hit.normal(), fuzz));
+    static Material metal(Vector color, double fuzz) {
+        return new MetalMaterial(color, fuzz);
     }
 
     /**

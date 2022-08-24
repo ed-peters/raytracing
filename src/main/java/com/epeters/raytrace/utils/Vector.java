@@ -104,6 +104,10 @@ public record Vector(double x, double y, double z) {
         return result;
     }
 
+    public double dot(Vector l, Vector r) {
+        return Utils.dot(l.x, l.y, l.z, r.x, r.y, r.z);
+    }
+
     public static Vector vec(double x, double y, double z) {
         return new Vector(x, y, z);
     }

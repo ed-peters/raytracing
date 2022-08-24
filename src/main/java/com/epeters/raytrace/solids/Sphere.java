@@ -4,6 +4,7 @@ import com.epeters.raytrace.hitting.BoundingBox;
 import com.epeters.raytrace.utils.Vector;
 
 import static com.epeters.raytrace.utils.Utils.dot;
+import static com.epeters.raytrace.utils.Utils.mag;
 import static com.epeters.raytrace.utils.Utils.sqrt;
 import static com.epeters.raytrace.utils.Utils.square;
 import static com.epeters.raytrace.utils.Vector.vec;
@@ -33,7 +34,17 @@ public final class Sphere extends Solid {
 
     @Override
     public Vector surfaceNormal(Vector point, double time) {
-        return point.minus(center).div(radius).normalize();
+
+        double nx = (point.x() - center.x()) / radius;
+        double ny = (point.y() - center.y()) / radius;
+        double nz = (point.z() - center.z()) / radius;
+
+        double nm = 1.0 / mag(nx, ny, nz);
+        nx *= nm;
+        ny *= nm;
+        nz *= nm;
+
+        return new Vector(nx, ny, nz);
     }
 
     @Override

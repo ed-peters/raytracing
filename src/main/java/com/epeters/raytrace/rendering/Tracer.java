@@ -102,11 +102,17 @@ public class Tracer {
     /** Computes the background color for the specified ray */
     private Vector backgroundColor(Ray ray) {
         double t = 0.5f * (ray.direction().y() + 1.0);
-        return WHITE.mul(1.0 - t).plus(SKY_BLUE.mul(t));
+        double cx = (WHITE.x() - t) + SKY_BLUE.x() * t;
+        double cy = (WHITE.y() - t) + SKY_BLUE.y() * t;
+        double cz = (WHITE.z() - t) + SKY_BLUE.z() * t;
+        return vec(cx, cy, cz);
     }
 
     /** Computes the default color for an object with no material */
     private Vector defaultColor(Hit hit) {
-        return hit.normal().plus(WHITE).mul(0.5);
+        double cx = 0.5 * (hit.normal().x() + 1.0);
+        double cy = 0.5 * (hit.normal().y() + 1.0);
+        double cz = 0.5 * (hit.normal().z() + 1.0);
+        return vec(cx, cy, cz);
     }
 }
