@@ -94,4 +94,16 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public static double mag(double ax, double ay, double az) {
+        return sqrt(square(ax, ay, az));
+    }
+
+    public static double square(double ax, double ay, double az) {
+        return dot(ax, ay, az, ax, ay, az);
+    }
+
+    public static double dot(double ax, double ay, double az, double bx, double by, double bz) {
+        return ax * bx + ay * by + az * bz;
+    }
 }

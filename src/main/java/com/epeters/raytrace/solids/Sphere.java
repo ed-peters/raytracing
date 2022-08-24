@@ -3,7 +3,9 @@ package com.epeters.raytrace.solids;
 import com.epeters.raytrace.hitting.BoundingBox;
 import com.epeters.raytrace.utils.Vector;
 
+import static com.epeters.raytrace.utils.Utils.dot;
 import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.square;
 import static com.epeters.raytrace.utils.Vector.vec;
 
 /**
@@ -37,10 +39,19 @@ public final class Sphere extends Solid {
     @Override
     protected double hitDistance(Ray ray, double tmin, double tmax) {
 
-        Vector oc = ray.origin().minus(center);
-        double a = ray.direction().square();
-        double hb = oc.dot(ray.direction());
-        double c = oc.square() - radius * radius;
+        Vector oc = ray.origin();
+        double ocx = oc.x() - center.x();
+        double ocy = oc.y() - center.y();
+        double ocz = oc.z() - center.z();
+
+        Vector rd = ray.direction();
+        double rdx = rd.x();
+        double rdy = rd.y();
+        double rdz = rd.z();
+
+        double a = square(rdx, rdy, rdz);
+        double hb = dot(ocx, ocy, ocz, rdx, rdy, rdz);
+        double c = square(ocx, ocy, ocz) - radius * radius;
         double d = hb * hb - a * c;
         if (d < 0.0) {
             return Double.NaN;
