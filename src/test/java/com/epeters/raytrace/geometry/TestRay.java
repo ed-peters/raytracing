@@ -1,10 +1,11 @@
 package com.epeters.raytrace.geometry;
 
+import com.epeters.raytrace.Ray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static com.epeters.raytrace.utils.Vector.ORIGIN;
-import static com.epeters.raytrace.utils.Vector.vec;
+import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
 
 public class TestRay {
 

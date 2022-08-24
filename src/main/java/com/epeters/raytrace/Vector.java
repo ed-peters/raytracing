@@ -1,8 +1,11 @@
-package com.epeters.raytrace.utils;
+package com.epeters.raytrace;
 
-import static com.epeters.raytrace.utils.Utils.randomUnitVector;
-import static com.epeters.raytrace.utils.Utils.scaleInt;
-import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.Utils.randomUnitVector;
+import static com.epeters.raytrace.Utils.scaleInt;
+import static com.epeters.raytrace.Utils.sqrt;
+
+import static java.lang.Math.min;
+import static java.lang.Math.max;
 
 /**
  * Three-dimensional double vector
@@ -10,6 +13,15 @@ import static com.epeters.raytrace.utils.Utils.sqrt;
 public record Vector(double x, double y, double z) {
 
     public static final Vector ORIGIN = new Vector(0.0, 0.0, 0.0);
+
+    public double component(int which) {
+        return switch (which) {
+            case 0 -> x();
+            case 1 -> y();
+            case 2 -> z();
+            default -> throw new IllegalArgumentException("unknown component "+which);
+        };
+    }
 
     public Vector negate() {
         return new Vector(-x, -y, -z);
@@ -66,11 +78,22 @@ public record Vector(double x, double y, double z) {
         return dot(other) < 0.0f;
     }
 
-    public int [] toRgb() {
-        return new int[]{
-                scaleInt(x, 255),
-                scaleInt(y, 255),
-                scaleInt(z, 255) };
+    public Vector minWith(Vector other) {
+        return vec(min(x, other.x), min(y, other.y), min(z, other.z));
+    }
+
+    public Vector maxWith(Vector other) {
+        return vec(max(x, other.x), max(y, other.y), max(z, other.z));
+    }
+
+    public int toRgb() {
+        int r = scaleInt(x(), 255);
+        int g = scaleInt(y(), 255);
+        int b = scaleInt(z(), 255);
+        r = (r << 16) & 0x00FF0000;
+        g = (g << 8) & 0x0000FF00;
+        b = b & 0x000000FF;
+        return 0xFF000000 | r | g | b;
     }
 
     /**

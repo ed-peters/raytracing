@@ -1,9 +1,7 @@
-package com.epeters.raytrace.geometry;
+package com.epeters.raytrace;
 
-import com.epeters.raytrace.utils.Vector;
-
-import static com.epeters.raytrace.utils.Vector.ORIGIN;
-import static com.epeters.raytrace.utils.Vector.vec;
+import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
 
 /**
  * Represents a ray in 3D space, characterized by an origin and a direction. Direction

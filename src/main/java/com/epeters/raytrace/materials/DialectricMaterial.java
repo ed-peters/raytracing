@@ -1,29 +1,30 @@
-package com.epeters.raytrace.material;
+package com.epeters.raytrace.materials;
 
-import com.epeters.raytrace.geometry.Hit;
-import com.epeters.raytrace.utils.Vector;
+import com.epeters.raytrace.hittables.HitInfo;
+import com.epeters.raytrace.Vector;
 
-import static com.epeters.raytrace.utils.Utils.WHITE;
-import static com.epeters.raytrace.utils.Utils.random;
-import static com.epeters.raytrace.utils.Utils.sqrt;
-import static com.epeters.raytrace.utils.Utils.square;
+import static com.epeters.raytrace.Utils.WHITE;
+import static com.epeters.raytrace.Utils.random;
+import static com.epeters.raytrace.Utils.sqrt;
+import static com.epeters.raytrace.Utils.square;
 
 import static java.lang.Math.abs;
 
-public class Dialectric implements Material {
+public class DialectricMaterial implements Material {
 
     private final double frontRatio;
     private final double backRatio;
 
-    public Dialectric(double indexOfRefraction) {
+    public DialectricMaterial(double indexOfRefraction) {
         this.frontRatio = 1.0 / indexOfRefraction;
         this.backRatio = indexOfRefraction;
     }
 
     @Override
-    public Scatter computeScatter(Hit hit) {
-        double ratio = hit.front() ? frontRatio : backRatio;
-        return new Scatter(WHITE, refract(hit.incoming(), hit.normal(), ratio));
+    public void computeScatter(HitInfo hit) {
+        double ratio = hit.isFront() ? frontRatio : backRatio;
+        hit.setColor(WHITE);
+        hit.setBounce(refract(hit.getRay().direction(), hit.getNormal(), ratio));
     }
 
     private Vector refract(Vector incoming, Vector normal, double ratio) {

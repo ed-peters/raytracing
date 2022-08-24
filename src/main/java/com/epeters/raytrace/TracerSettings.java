@@ -1,9 +1,7 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.utils.Vector;
-
-import static com.epeters.raytrace.utils.Vector.ORIGIN;
-import static com.epeters.raytrace.utils.Vector.vec;
+import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
 
 public class TracerSettings {
 
@@ -14,8 +12,10 @@ public class TracerSettings {
     public double fieldOfView = 90.0;
     public double focalDistance = 1.0;
     public double aperture = 0.0;
+    public int imageWidth = 600;
 
     public int samplesPerPixel = 100;
     public int bouncesPerPixel = 10;
+    public boolean useBoundingVolume = false;
 
 }

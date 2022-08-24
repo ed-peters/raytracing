@@ -1,20 +1,22 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.geometry.Hit;
-import com.epeters.raytrace.geometry.Ray;
-import com.epeters.raytrace.material.Scatter;
-import com.epeters.raytrace.material.Material;
-import com.epeters.raytrace.utils.Vector;
+import com.epeters.raytrace.hittables.BoundingBox;
+import com.epeters.raytrace.hittables.BoundingVolume;
+import com.epeters.raytrace.hittables.Hit;
+import com.epeters.raytrace.hittables.HitInfo;
+import com.epeters.raytrace.hittables.Hittable;
+import com.epeters.raytrace.hittables.HittableList;
+import com.epeters.raytrace.renderer.Renderer;
+import com.epeters.raytrace.solids.Solid;
 
 import java.util.List;
 
-import static com.epeters.raytrace.utils.Utils.BLACK;
-import static com.epeters.raytrace.utils.Utils.SKY_BLUE;
-import static com.epeters.raytrace.utils.Utils.WHITE;
-import static com.epeters.raytrace.utils.Utils.random;
-import static com.epeters.raytrace.utils.Utils.sqrt;
-import static com.epeters.raytrace.utils.Utils.time;
-import static com.epeters.raytrace.utils.Vector.vec;
+import static com.epeters.raytrace.Utils.BLACK;
+import static com.epeters.raytrace.Utils.SKY_BLUE;
+import static com.epeters.raytrace.Utils.WHITE;
+import static com.epeters.raytrace.Utils.random;
+import static com.epeters.raytrace.Utils.sqrt;
+import static com.epeters.raytrace.Vector.vec;
 
 public class Tracer {
 
@@ -22,8 +24,10 @@ public class Tracer {
     private final int bouncesPerPixel;
     private final double sampleScale;
     private final Camera camera;
-    private final List<Solid> world;
+    private final Hittable world;
     private final double aspectRatio;
+    private final int imageWidth;
+    private final int imageHeight;
 
     public Tracer(TracerSettings settings, List<Solid> world) {
         this.samplesPerPixel = settings.samplesPerPixel;
@@ -31,40 +35,42 @@ public class Tracer {
         this.sampleScale = 1.0 / samplesPerPixel;
         this.aspectRatio = settings.aspectRatio;
         this.camera = new Camera(settings);
-        this.world = world;
+        this.world = settings.useBoundingVolume ? BoundingVolume.from(world) : new HittableList(world);
+        this.imageWidth = settings.imageWidth;
+        this.imageHeight = (int)(imageWidth / settings.aspectRatio);
     }
 
-    /**
-     * Renders an image of the specified width. This is the outer loop of tracing;
-     * it will compute each pixel with the appropriate number of samples and then
-     * scale/correct the resulting color value.
-     */
-    public Image render(int imageWidth) {
-        Image canvas = new Image(imageWidth, (int)(imageWidth / aspectRatio));
-        canvas.forEach((x,y) -> {
-            if (x == 0) {
-                System.err.println("working on row "+y);
-            }
-            for (int s=0; s<samplesPerPixel; s++) {
-                Ray ray = computeRay(canvas, x, y);
-                Vector color = computeColor(ray, bouncesPerPixel);
-                canvas.update(x, y, pixel -> pixel.plus(color));
-            }
-            canvas.update(x, y, (value) -> {
-                double newX = sqrt(value.x() * sampleScale);
-                double newY = sqrt(value.y() * sampleScale);
-                double newZ = sqrt(value.z() * sampleScale);
-                return vec(newX, newY, newZ);
-            });
-        });
-        return canvas;
+    public int getImageWidth() {
+        return imageWidth;
     }
 
-    /** Computes a ray from the camera through the image at the specified x,y, with a little fuzz */
-    private Ray computeRay(Image canvas, int x, int y) {
-        double u = (x + random(-0.5, 0.5)) / (double) (canvas.width - 1);
-        double v = (y + random(-0.5, 0.5)) / (double) (canvas.height - 1);
-        return camera.computeRay(u, v);
+    public int getImageHeight() {
+        return imageHeight;
+    }
+
+    /** Renders a single pixel of the output image */
+    public Vector renderPixel(int x, int y) {
+
+        double pixelX = 0.0;
+        double pixelY = 0.0;
+        double pixelZ = 0.0;
+
+        for (int s=0; s<samplesPerPixel; s++) {
+
+            double u = (x + random(-0.5, 0.5)) / (double) (imageWidth - 1);
+            double v = (y + random(-0.5, 0.5)) / (double) (imageHeight - 1);
+            Ray ray = camera.computeRay(u, v);
+
+            Vector color = computeColor(ray, bouncesPerPixel);
+            pixelX += color.x();
+            pixelY += color.y();
+            pixelZ += color.z();
+        }
+
+        pixelX = sqrt(pixelX * sampleScale);
+        pixelY = sqrt(pixelY * sampleScale);
+        pixelZ = sqrt(pixelZ * sampleScale);
+        return vec(pixelX, pixelY, pixelZ);
     }
 
     /** Determines the color of the scene at the point hit by the specified ray */
@@ -76,20 +82,26 @@ public class Tracer {
         }
 
         // if we don't hit, this ray will contribute the background color
-        Hit hit = Solid.computeHit(world, ray);
+        Hit hit = world.hit(ray, 1e-8, Double.MAX_VALUE);
         if (hit == null) {
             return backgroundColor(ray);
         }
 
+        // if we do have a hit, let's find out more
+        HitInfo info = hit.info().get();
+
         // if the solid doesn't have a material, we'll do normal shading
-        Material material = hit.object().material();
-        if (material == null) {
-            return defaultColor(hit);
+        if (info.getColor() == null) {
+            return defaultColor(info);
         }
 
-        Scatter scatter = material.computeScatter(hit);
-        Ray bounceRay = new Ray(hit.point(), scatter.direction());
-        return scatter.attenuation().mul(computeColor(bounceRay, bouncesRemaining-1));
+        // if there's no scattering, we're a solid color
+        if (info.getBounce() == null) {
+            return info.getColor();
+        }
+
+        Ray bounceRay = new Ray(info.getPoint(), info.getBounce());
+        return info.getColor().mul(computeColor(bounceRay, bouncesRemaining-1));
     }
 
     /** Computes the background color for the specified ray */
@@ -99,13 +111,16 @@ public class Tracer {
     }
 
     /** Computes the default color for an object with no material */
-    private Vector defaultColor(Hit hit) {
-        return hit.normal().plus(WHITE).mul(0.5);
+    private Vector defaultColor(HitInfo info) {
+        return info.getNormal().plus(WHITE).mul(0.5);
     }
 
     public static void main(String [] args) {
+
+        int threads = Runtime.getRuntime().availableProcessors() - 1;
+
         Tracer tracer = Scenes.randomWorld();
-        Image image = time(() -> tracer.render(800));
-        image.writePpm("/Users/ed.peters/Desktop/trace.ppm");
+        Renderer renderer = new Renderer(tracer, "trace.png", threads);
+        Utils.time(() -> renderer.render());
     }
 }

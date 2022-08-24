@@ -1,22 +1,22 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.material.Material;
-import com.epeters.raytrace.utils.Vector;
+import com.epeters.raytrace.materials.Material;
+import com.epeters.raytrace.solids.Solid;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epeters.raytrace.utils.Utils.MID_GRAY;
-import static com.epeters.raytrace.utils.Utils.random;
-import static com.epeters.raytrace.utils.Utils.randomVectorInUnitCube;
-import static com.epeters.raytrace.utils.Vector.ORIGIN;
-import static com.epeters.raytrace.utils.Vector.vec;
-import static com.epeters.raytrace.utils.Utils.RED;
-import static com.epeters.raytrace.utils.Utils.BLUE;
-import static com.epeters.raytrace.material.Material.lambertian;
-import static com.epeters.raytrace.material.Material.metal;
-import static com.epeters.raytrace.material.Material.dialectric;
-import static com.epeters.raytrace.Solid.sphere;
+import static com.epeters.raytrace.Utils.MID_GRAY;
+import static com.epeters.raytrace.Utils.random;
+import static com.epeters.raytrace.Utils.randomVectorInUnitCube;
+import static com.epeters.raytrace.Vector.ORIGIN;
+import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.Utils.RED;
+import static com.epeters.raytrace.Utils.BLUE;
+import static com.epeters.raytrace.materials.Material.lambertian;
+import static com.epeters.raytrace.materials.Material.metal;
+import static com.epeters.raytrace.materials.Material.dialectric;
+import static com.epeters.raytrace.solids.Solid.sphere;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 
@@ -127,6 +127,8 @@ public class Scenes {
         settings.up = vec(0.0, 1.0, 0.0);
         settings.focalDistance = 10.0;
         settings.aperture = 0.1;
+        settings.imageWidth = 1000;
+        settings.useBoundingVolume = true;
         settings.samplesPerPixel = 500;
         settings.bouncesPerPixel = 50;
         return new Tracer(settings, world);
