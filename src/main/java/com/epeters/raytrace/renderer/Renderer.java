@@ -25,7 +25,7 @@ public class Renderer {
 
     public Renderer(Tracer tracer, String path, int threads) {
         this.tracer = tracer;
-        this.file = new File(System.getProperty("user.home")+"/Desktop/trace.png");
+        this.file = new File(path);
         this.threads = threads;
         this.progress = new ParallelProgress(tracer.getImageWidth() * tracer.getImageHeight());
     }

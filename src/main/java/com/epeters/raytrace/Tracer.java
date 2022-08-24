@@ -114,13 +114,4 @@ public class Tracer {
     private Vector defaultColor(HitInfo info) {
         return info.getNormal().plus(WHITE).mul(0.5);
     }
-
-    public static void main(String [] args) {
-
-        int threads = Runtime.getRuntime().availableProcessors() - 1;
-
-        Tracer tracer = Scenes.randomWorld();
-        Renderer renderer = new Renderer(tracer, "trace.png", threads);
-        Utils.time(() -> renderer.render());
-    }
 }

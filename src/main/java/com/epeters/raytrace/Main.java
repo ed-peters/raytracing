@@ -1,30 +1,47 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.hittables.BoundingVolume;
-import com.epeters.raytrace.hittables.Hit;
 import com.epeters.raytrace.materials.Material;
+import com.epeters.raytrace.renderer.Renderer;
 import com.epeters.raytrace.solids.Solid;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.materials.Material.dialectric;
+import static com.epeters.raytrace.materials.Material.lambertian;
+import static com.epeters.raytrace.materials.Material.metal;
+import static com.epeters.raytrace.solids.Solid.sphere;
 
 public class Main {
 
     public static void main(String [] args) {
 
-        Material blue = Material.lambertian(Utils.BLUE);
-        List<Solid> solids = Arrays.asList(
-                Solid.sphere(Vector.vec(1.0, 1.0, -1.0), 0.9, blue),
-                Solid.sphere(Vector.vec(1.0, -1.0, -1.0), 1.0, blue),
-                Solid.sphere(Vector.vec(-1.0, -1.0, -1.0), 1.1, blue),
-                Solid.sphere(Vector.vec(-1.0, 1.0, -1.0), 1.2, blue));
+        Material ground = lambertian(vec(0.8, 0.8, 0.0));
+        Material left = dialectric(1.5);
+        Material center = lambertian(vec(0.1, 0.2, 0.5));
+        Material right = metal(vec(0.8, 0.6, 0.2), 0.0);
 
-        BoundingVolume volume = BoundingVolume.from(new ArrayList<>(solids));
+        List<Solid> world = new ArrayList<>();
+        world.add(sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
+        world.add(sphere(vec(-1.0, 0.0, -1.0), 0.5, left));
+        world.add(sphere(vec(-1.0, 0.0, -1.0), -0.4, left));
+        world.add(sphere(vec(0.0, 0.0, -1.0), 0.5, center));
+        world.add(sphere(vec(1.0, 0.0, -1.0), 0.5, right));
 
-        Ray ray = new Ray(1.0, 1.0, -1.0);
-        Hit hit = volume.hit(ray, 1e-8, Double.MAX_VALUE);
-        System.err.println(hit.info().get().getSolid());
+        TracerSettings settings = new TracerSettings();
+        settings.useBoundingVolume = true;
+        settings.aspectRatio = 3.0 / 2.0;
+        settings.imageWidth = 600;
+        settings.bouncesPerPixel = 10;
+        settings.samplesPerPixel = 10;
+
+        int threads = Runtime.getRuntime().availableProcessors() - 1;
+        String path = System.getProperty("user.home") + "/Desktop/trace.png";
+
+        Tracer tracer = new Tracer(settings, world);
+        Renderer renderer = new Renderer(tracer, path, threads);
+        Utils.time(() -> renderer.render());
     }
 
 }
