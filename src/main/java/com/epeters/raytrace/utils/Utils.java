@@ -1,9 +1,9 @@
-package com.epeters.raytrace;
+package com.epeters.raytrace.utils;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 /**
  * Helpers for common simple stuff
@@ -32,8 +32,12 @@ public class Utils {
         return vec(random(min, max), random(min, max), random(min, max));
     }
 
+    public static int randomInt(int max) {
+        return ThreadLocalRandom.current().nextInt(max);
+    }
+
     public static int randomComponent() {
-        return ThreadLocalRandom.current().nextInt(3);
+        return randomInt(3);
     }
 
     public static Vector randomVectorInUnitCube() {
@@ -63,6 +67,14 @@ public class Utils {
             return min;
         }
         return Math.min(x, max);
+    }
+
+    public static double dot(double ax, double ay, double az) {
+        return dot(ax, ay, az, ax, ay, az);
+    }
+
+    public static double dot(double ax, double ay, double az, double bx, double by, double bz) {
+        return ax * bx + ay * by + az * bz;
     }
 
     public static int scaleInt(double val, int factor) {

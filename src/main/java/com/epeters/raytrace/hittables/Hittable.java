@@ -9,7 +9,7 @@ import com.epeters.raytrace.solids.Solid;
  */
 public interface Hittable {
 
-    /** @return the bounding box for this hittable */
+    /** @return the bounding box for this hittable (this will be called a lot) */
     BoundingBox getBounds();
 
     /** @retyrn a new {@link Hit} if this ray hit something; null otherwise */

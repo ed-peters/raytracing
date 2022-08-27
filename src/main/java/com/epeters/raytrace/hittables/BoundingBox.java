@@ -1,12 +1,15 @@
 package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.utils.Vector;
 
 import java.util.List;
 
 /**
- * AABB
+ * Represents an axis-aligned bounding box (AABB). This is just a volume in space that knows how to
+ * test intersections with a Ray (like a Hittable, but very fast and with no knowledge of what is
+ * actually inside it).
+ *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/axis-alignedboundingboxes(aabbs)">guide</a>
  */
 public class BoundingBox {

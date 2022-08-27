@@ -1,7 +1,8 @@
 package com.epeters.raytrace.materials;
 
-import com.epeters.raytrace.hittables.HitInfo;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.hittables.HitDetails;
+import com.epeters.raytrace.utils.Vector;
+import com.epeters.raytrace.textures.Texture;
 
 /**
  * Interface for a component that knows how to compute the scattering of light
@@ -9,11 +10,16 @@ import com.epeters.raytrace.Vector;
  */
 public interface Material {
 
-    /** Computes attenuation and bounce given the supplied hit info */
-    void computeScatter(HitInfo hit);
+    default Vector computeEmission(HitDetails hit) { return null; }
+    Vector computeAttenuation(HitDetails hit);
+    Vector computeBounce(HitDetails hit);
 
     static Material lambertian(Vector color) {
         return new LambertianMaterial(color);
+    }
+
+    static Material lambertian(Texture texture) {
+        return new LambertianMaterial(texture);
     }
 
     static Material metal(Vector color, double fuzz) {
@@ -23,4 +29,6 @@ public interface Material {
     static Material dialectric(double backRatio) {
         return new DialectricMaterial(backRatio);
     }
+
+    static Material light(Vector color) { return new LightedMaterial(Texture.solid(color)); }
 }

@@ -1,8 +1,8 @@
-package com.epeters.raytrace;
+package com.epeters.raytrace.utils;
 
-import static com.epeters.raytrace.Utils.randomUnitVector;
-import static com.epeters.raytrace.Utils.scaleInt;
-import static com.epeters.raytrace.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.randomUnitVector;
+import static com.epeters.raytrace.utils.Utils.scaleInt;
+import static com.epeters.raytrace.utils.Utils.sqrt;
 
 import static java.lang.Math.min;
 import static java.lang.Math.max;
@@ -51,7 +51,7 @@ public record Vector(double x, double y, double z) {
     }
 
     public double dot(Vector other) {
-        return x * other.x + y * other.y + z * other.z;
+        return Utils.dot(x, y, z, other.x, other.y, other.z);
     }
 
     public double square() {

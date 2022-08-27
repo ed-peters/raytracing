@@ -1,9 +1,9 @@
 package com.epeters.raytrace.materials;
 
-import com.epeters.raytrace.hittables.HitInfo;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.hittables.HitDetails;
+import com.epeters.raytrace.utils.Vector;
 
-import static com.epeters.raytrace.Utils.clamp;
+import static com.epeters.raytrace.utils.Utils.clamp;
 
 /**
  * Implements metal reflection with fuzzing
@@ -20,9 +20,12 @@ public class MetalMaterial implements Material {
     }
 
     @Override
-    public void computeScatter(HitInfo hit) {
-        Vector rd = hit.getRay().direction();
-        hit.setColor(color);
-        hit.setBounce(rd.reflect(hit.getNormal(), fuzz));
+    public Vector computeAttenuation(HitDetails hit) {
+        return color;
+    }
+
+    @Override
+    public Vector computeBounce(HitDetails hit) {
+        return hit.ray().direction().reflect(hit.normal(), fuzz);
     }
 }

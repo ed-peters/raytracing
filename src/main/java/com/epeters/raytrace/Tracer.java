@@ -1,22 +1,20 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.hittables.BoundingBox;
 import com.epeters.raytrace.hittables.BoundingVolume;
 import com.epeters.raytrace.hittables.Hit;
-import com.epeters.raytrace.hittables.HitInfo;
+import com.epeters.raytrace.hittables.HitDetails;
 import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.hittables.HittableList;
-import com.epeters.raytrace.renderer.Renderer;
-import com.epeters.raytrace.solids.Solid;
+import com.epeters.raytrace.materials.Material;
+import com.epeters.raytrace.utils.Vector;
 
-import java.util.List;
+import java.util.function.Function;
 
-import static com.epeters.raytrace.Utils.BLACK;
-import static com.epeters.raytrace.Utils.SKY_BLUE;
-import static com.epeters.raytrace.Utils.WHITE;
-import static com.epeters.raytrace.Utils.random;
-import static com.epeters.raytrace.Utils.sqrt;
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Utils.BLACK;
+import static com.epeters.raytrace.utils.Utils.random;
+import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Vector.ORIGIN;
+import static com.epeters.raytrace.utils.Vector.vec;
 
 public class Tracer {
 
@@ -25,19 +23,21 @@ public class Tracer {
     private final double sampleScale;
     private final Camera camera;
     private final Hittable world;
-    private final double aspectRatio;
     private final int imageWidth;
     private final int imageHeight;
+    private final Function<Ray,Vector> backgroundColor;
+    private final Function<HitDetails,Vector> defaultColor;
 
-    public Tracer(TracerSettings settings, List<Solid> world) {
-        this.samplesPerPixel = settings.samplesPerPixel;
-        this.bouncesPerPixel = settings.bouncesPerPixel;
+    public Tracer(SceneConfig config) {
+        this.samplesPerPixel = config.samplesPerPixel;
+        this.bouncesPerPixel = config.bouncesPerPixel;
         this.sampleScale = 1.0 / samplesPerPixel;
-        this.aspectRatio = settings.aspectRatio;
-        this.camera = new Camera(settings);
-        this.world = settings.useBoundingVolume ? BoundingVolume.from(world) : new HittableList(world);
-        this.imageWidth = settings.imageWidth;
-        this.imageHeight = (int)(imageWidth / settings.aspectRatio);
+        this.camera = new Camera(config);
+        this.world = config.useBoundingVolume ? BoundingVolume.from(config) : new HittableList(config);
+        this.imageWidth = config.imageWidth;
+        this.imageHeight = (int)(imageWidth / config.aspectRatio);
+        this.backgroundColor = config.backgroundColor;
+        this.defaultColor = config.defaultColor;
     }
 
     public int getImageWidth() {
@@ -84,34 +84,32 @@ public class Tracer {
         // if we don't hit, this ray will contribute the background color
         Hit hit = world.hit(ray, 1e-8, Double.MAX_VALUE);
         if (hit == null) {
-            return backgroundColor(ray);
+            return backgroundColor.apply(ray);
         }
 
         // if we do have a hit, let's find out more
-        HitInfo info = hit.info().get();
+        HitDetails details = hit.solid().computeHitDetails(hit);
 
-        // if the solid doesn't have a material, we'll do normal shading
-        if (info.getColor() == null) {
-            return defaultColor(info);
+        // if there is no material, we'll just compute a default color
+        Material material = details.solid().getMaterial();
+        if (material == null) {
+            return defaultColor.apply(details);
         }
 
-        // if there's no scattering, we're a solid color
-        if (info.getBounce() == null) {
-            return info.getColor();
+        // if there is a material, we'll use it to compute onward lighting info
+        Vector emission = material.computeEmission(details);
+        Vector attenuation = material.computeAttenuation(details);
+        Vector bounce = material.computeBounce(details);
+
+        Vector result = ORIGIN;
+        if (emission != null) {
+            result = result.plus(emission);
         }
-
-        Ray bounceRay = new Ray(info.getPoint(), info.getBounce());
-        return info.getColor().mul(computeColor(bounceRay, bouncesRemaining-1));
-    }
-
-    /** Computes the background color for the specified ray */
-    private Vector backgroundColor(Ray ray) {
-        double t = 0.5f * (ray.direction().normalize().y() + 1.0);
-        return WHITE.mul(1.0 - t).plus(SKY_BLUE.mul(t));
-    }
-
-    /** Computes the default color for an object with no material */
-    private Vector defaultColor(HitInfo info) {
-        return info.getNormal().plus(WHITE).mul(0.5);
+        if (attenuation != null && bounce != null) {
+            Ray bounceRay = new Ray(details.point(), bounce);
+            Vector bounceColor = computeColor(bounceRay, bouncesRemaining - 1);
+            result = result.plus(attenuation.mul(bounceColor));
+        }
+        return result;
     }
 }

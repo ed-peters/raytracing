@@ -1,12 +1,12 @@
 package com.epeters.raytrace.materials;
 
-import com.epeters.raytrace.hittables.HitInfo;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.hittables.HitDetails;
+import com.epeters.raytrace.utils.Vector;
 
-import static com.epeters.raytrace.Utils.WHITE;
-import static com.epeters.raytrace.Utils.random;
-import static com.epeters.raytrace.Utils.sqrt;
-import static com.epeters.raytrace.Utils.square;
+import static com.epeters.raytrace.utils.Utils.WHITE;
+import static com.epeters.raytrace.utils.Utils.random;
+import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Utils.square;
 
 import static java.lang.Math.abs;
 
@@ -21,10 +21,14 @@ public class DialectricMaterial implements Material {
     }
 
     @Override
-    public void computeScatter(HitInfo hit) {
-        double ratio = hit.isFront() ? frontRatio : backRatio;
-        hit.setColor(WHITE);
-        hit.setBounce(refract(hit.getRay().direction(), hit.getNormal(), ratio));
+    public Vector computeAttenuation(HitDetails hit) {
+        return WHITE;
+    }
+
+    @Override
+    public Vector computeBounce(HitDetails hit) {
+        double ratio = hit.front() ? frontRatio : backRatio;
+        return refract(hit.ray().direction(), hit.normal(), ratio);
     }
 
     private Vector refract(Vector incoming, Vector normal, double ratio) {

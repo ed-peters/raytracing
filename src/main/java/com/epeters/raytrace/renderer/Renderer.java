@@ -1,7 +1,7 @@
 package com.epeters.raytrace.renderer;
 
 import com.epeters.raytrace.Tracer;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.utils.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -9,12 +9,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Renderer {
 
@@ -46,7 +50,7 @@ public class Renderer {
     public List<Vector[]> renderThreaded() {
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        Map<Integer,Vector[]> rows = new TreeMap<>();
+        Map<Integer,Vector[]> rows = new ConcurrentHashMap<>();
 
         progress.start();
         for (int i=0; i<tracer.getImageHeight(); i++) {
@@ -66,9 +70,9 @@ public class Renderer {
         }
         progress.reportProgress();
 
-        List<Vector[]> list = new ArrayList<>(rows.values());
-        Collections.reverse(list);
-        return list;
+        List<Integer> list = new ArrayList<>(rows.keySet());
+        Collections.sort(list, Comparator.reverseOrder());
+        return list.stream().map(rows::get).collect(Collectors.toList());
     }
 
     /** Renders a single row of the image */
@@ -85,8 +89,11 @@ public class Renderer {
         BufferedImage image = new BufferedImage(tracer.getImageWidth(), tracer.getImageHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y=0; y<rows.size(); y++) {
             Vector [] row = rows.get(y);
+            System.err.println(y);
             for (int x=0; x<row.length; x++) {
-                image.setRGB(x, y, row[x].toRgb());
+                Vector pixel = row[x];
+                int rgb = pixel.toRgb();
+                image.setRGB(x, y, rgb);
             }
         }
         try {

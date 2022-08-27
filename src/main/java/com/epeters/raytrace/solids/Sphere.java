@@ -1,13 +1,19 @@
 package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.Vector;
+import com.epeters.raytrace.utils.Mector;
+import com.epeters.raytrace.utils.TextureCoordinates;
+import com.epeters.raytrace.utils.Vector;
 import com.epeters.raytrace.hittables.BoundingBox;
 import com.epeters.raytrace.materials.Material;
 
-import static com.epeters.raytrace.Utils.sqrt;
-import static com.epeters.raytrace.Vector.vec;
+import static com.epeters.raytrace.utils.Utils.dot;
+import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Vector.vec;
+import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.acos;
+import static java.lang.Math.atan2;
 
 /**
  * Concrete implementation of {@link Solid} for a simple sphere.
@@ -26,10 +32,16 @@ public class Sphere extends Solid {
     @Override
     protected double computeHitDistance(Ray ray, double tmin, double tmax) {
 
-        Vector oc = ray.origin().minus(center);
-        double a = ray.direction().square();
-        double hb = oc.dot(ray.direction());
-        double c = oc.square() - radius * radius;
+        Vector ro = ray.origin();
+        Vector rd = ray.direction();
+
+        double ocx = ro.x() - center.x();
+        double ocy = ro.y() - center.y();
+        double ocz = ro.z() - center.z();
+
+        double a = dot(rd.x(), rd.y(), rd.z());
+        double hb = dot(ocx, ocy, ocz, rd.x(), rd.y(), rd.z());
+        double c = dot(ocx, ocy, ocz) - radius * radius;
         double d = hb * hb - a * c;
         if (d < 0.0) {
             return Double.NaN;
@@ -47,15 +59,22 @@ public class Sphere extends Solid {
         return t;
     }
 
+    @Override
+    protected Vector computeSurfaceNormal(Vector point) {
+        return new Mector().plus(point).minus(center).div(radius).normalize().toVector();
+    }
+
+    @Override
+    protected TextureCoordinates computeTextureCoordinates(Vector point, Vector normal) {
+        double theta = acos(-normal.y());
+        double phi = atan2(-normal.z(), normal.x()) + PI;
+        return new TextureCoordinates(phi / (2*PI), theta / PI);
+    }
+
     public String toString() {
         return String.format("Sphere[material=%s, center=%s, radius=%.2f]",
                 getMaterial().getClass().getSimpleName(),
                 center, radius);
-    }
-
-    @Override
-    protected Vector computeSurfaceNormal(Vector point) {
-        return point.minus(center).div(radius).normalize();
     }
 
     private static BoundingBox computeBounds(Vector center, double radius) {

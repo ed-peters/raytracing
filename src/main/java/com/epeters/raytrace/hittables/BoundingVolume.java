@@ -8,8 +8,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.epeters.raytrace.Utils.randomComponent;
+import static com.epeters.raytrace.utils.Utils.randomComponent;
 
+/**
+ * Implementation of {@link Hittable} that represents an abstract volume in space. Implements a
+ * recursive tree structure that speeds up intersection testing.
+ *
+ * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/thebvhnodeclass">guide</a>
+ */
 public class BoundingVolume implements Hittable {
 
     private final Hittable left;

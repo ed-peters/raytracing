@@ -1,11 +1,13 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.utils.Vector;
+
 import static java.lang.Math.tan;
 import static java.lang.Math.toRadians;
-import static com.epeters.raytrace.Utils.randomVectorInUnitDisc;
+import static com.epeters.raytrace.utils.Utils.randomVectorInUnitDisc;
 
 /**
- * Represents the camera in the scene. Knows its position and dimensional info,
+ * Represents the camera in the scene. Knows its position and dimensional details,
  * and how to calculate a ray through the focal image.
  */
 public class Camera {
@@ -19,22 +21,23 @@ public class Camera {
     private final Vector v;
     private final Vector w;
 
-    public Camera(TracerSettings settings) {
+    public Camera(SceneConfig config) {
 
-        double viewportHeight = 2.0 * tan(toRadians(settings.fieldOfView) / 2.0);
-        double viewportWidth = settings.aspectRatio * viewportHeight;
+        double viewportHeight = 2.0 * tan(toRadians(config.fieldOfView) / 2.0);
+        double viewportWidth = config.aspectRatio * viewportHeight;
+        double focalDistance = config.position.minus(config.target).length();
 
-        this.w = settings.position.minus(settings.target).normalize();
-        this.u = settings.up.cross(w).normalize();
+        this.w = config.position.minus(config.target).normalize();
+        this.u = config.up.cross(w).normalize();
         this.v = w.cross(u);
-        this.origin = settings.position;
-        this.horizontal = u.mul(viewportWidth).mul(settings.focalDistance);
-        this.vertical = v.mul(viewportHeight).mul(settings.focalDistance);
+        this.origin = config.position;
+        this.horizontal = u.mul(viewportWidth).mul(focalDistance);
+        this.vertical = v.mul(viewportHeight).mul(focalDistance);
         this.lowerLeft = origin
                 .minus(horizontal.mul(0.5))
                 .minus(vertical.mul(0.5))
-                .minus(w.mul(settings.focalDistance));
-        this.lensRadius = settings.aperture / 2.0;
+                .minus(w.mul(focalDistance));
+        this.lensRadius = config.aperture / 2.0;
     }
 
     public Ray computeRay(double s, double t) {
