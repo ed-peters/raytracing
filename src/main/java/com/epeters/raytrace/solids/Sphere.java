@@ -1,8 +1,9 @@
 package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.hittables.HitColor;
+import com.epeters.raytrace.materials.MaterialParams;
 import com.epeters.raytrace.utils.Mector;
-import com.epeters.raytrace.utils.TextureCoordinates;
 import com.epeters.raytrace.utils.Vector;
 import com.epeters.raytrace.hittables.BoundingBox;
 import com.epeters.raytrace.materials.Material;
@@ -18,13 +19,13 @@ import static java.lang.Math.atan2;
 /**
  * Concrete implementation of {@link Solid} for a simple sphere.
  */
-public class Sphere extends Solid {
+public final class Sphere extends Solid {
 
     private final Vector center;
     private final double radius;
 
     public Sphere(Material material, Vector center, double radius) {
-        super(material, computeBounds(center, radius));
+        super(computeBounds(center, radius), material);
         this.center = center;
         this.radius = radius;
     }
@@ -60,15 +61,13 @@ public class Sphere extends Solid {
     }
 
     @Override
-    protected Vector computeSurfaceNormal(Vector point) {
-        return new Mector().plus(point).minus(center).div(radius).normalize().toVector();
-    }
-
-    @Override
-    protected TextureCoordinates computeTextureCoordinates(Vector point, Vector normal) {
+    protected HitColor computeHitColor(Vector point, Vector incoming) {
+        Vector normal = new Mector().plus(point).minus(center).div(radius).normalize().toVector();
         double theta = acos(-normal.y());
         double phi = atan2(-normal.z(), normal.x()) + PI;
-        return new TextureCoordinates(phi / (2*PI), theta / PI);
+        double u = phi / (2 * PI);
+        double v = theta / PI;
+        return getMaterial().computeHitColor(MaterialParams.from(point, incoming, normal, u, v));
     }
 
     public String toString() {

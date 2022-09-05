@@ -7,12 +7,12 @@ public class Main {
 
     public static void main(String [] args) {
 
-        SceneConfig config = Scenes.redBox();
-        config.imageWidth = 1400;
-        config.samplesPerPixel = 500;
-        config.bouncesPerPixel = 50;
+        SceneConfig config = Scenes.fuzzyThreeBalls();
+        config.imageWidth = 600;
+        config.samplesPerPixel = 10;
+        config.bouncesPerPixel = 10;
 
-        int threads = Runtime.getRuntime().availableProcessors() - 1;
+        int threads = 14; // Runtime.getRuntime().availableProcessors() - 1;
         String path = System.getProperty("user.home") + "/Desktop/trace.png";
 
         Tracer tracer = new Tracer(config);

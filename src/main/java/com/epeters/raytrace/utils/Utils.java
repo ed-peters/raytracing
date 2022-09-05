@@ -8,7 +8,7 @@ import static com.epeters.raytrace.utils.Vector.vec;
 /**
  * Helpers for common simple stuff
  */
-public class Utils {
+public final class Utils {
 
     public static final Vector RED = vec(1.0, 0.0, 0.0);
     public static final Vector BLACK = Vector.ORIGIN;

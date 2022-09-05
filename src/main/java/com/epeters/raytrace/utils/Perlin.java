@@ -11,7 +11,7 @@ import static java.lang.Math.floor;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#perlinnoise">guide</a>
  */
-public class Perlin {
+public final class Perlin {
 
     public static final int POINT_COUNT = 256;
 

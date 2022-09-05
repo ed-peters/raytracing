@@ -4,6 +4,7 @@ import static com.epeters.raytrace.utils.Utils.randomUnitVector;
 import static com.epeters.raytrace.utils.Utils.scaleInt;
 import static com.epeters.raytrace.utils.Utils.sqrt;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.lang.Math.max;
 
@@ -13,6 +14,8 @@ import static java.lang.Math.max;
 public record Vector(double x, double y, double z) {
 
     public static final Vector ORIGIN = new Vector(0.0, 0.0, 0.0);
+    public static final Vector MIN = new Vector(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+    public static final Vector MAX = new Vector(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
     public double component(int which) {
         return switch (which) {
@@ -62,16 +65,12 @@ public record Vector(double x, double y, double z) {
         return sqrt(square());
     }
 
-    public Vector div(double f) {
-        return new Vector(x / f, y / f, z / f);
-    }
-
     public double mag() {
         return sqrt(square());
     }
 
     public Vector normalize() {
-        return div(mag());
+        return mul(1.0 / mag());
     }
 
     public boolean isOpposite(Vector other) {
@@ -111,11 +110,24 @@ public record Vector(double x, double y, double z) {
      * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/fuzzyreflection">doc</a>
      */
     public Vector reflect(Vector normal, double fuzz) {
-        Vector result = minus(normal.mul(2.0 * dot(normal)));
+        double d = 2.0 * dot(normal);
+        Mector m = new Mector(this).plusTimes(normal, -d);
         if (fuzz > 0.0) {
-            result = result.plus(randomUnitVector().mul(fuzz));
+            m.plusTimes(randomUnitVector(), fuzz);
         }
-        return result;
+        return m.toVector();
+    }
+
+    public Vector rotateY(double sin, double cos) {
+        double newX = cos * x - sin * z;
+        double newZ = cos * z + sin * x;
+        return vec(newX, y, newZ);
+    }
+
+    public boolean equalish(Vector other) {
+        return abs(x - other.x) < 0.000001
+                && abs(y - other.y) < 0.000001
+                && abs(z - other.z) < 0.000001;
     }
 
     public static Vector vec(double x, double y, double z) {

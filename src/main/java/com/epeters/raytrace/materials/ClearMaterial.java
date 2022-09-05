@@ -1,6 +1,8 @@
 package com.epeters.raytrace.materials;
 
-import com.epeters.raytrace.hittables.HitDetails;
+import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.hittables.HitColor;
+import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 
 import static com.epeters.raytrace.utils.Utils.WHITE;
@@ -10,25 +12,25 @@ import static com.epeters.raytrace.utils.Utils.square;
 
 import static java.lang.Math.abs;
 
-public class DialectricMaterial implements Material {
+/**
+ * Implementation of a material that allows light to pass through it, possibly refracting it along
+ * the way. This can be used for e.g. glass and water.
+ */
+public final class ClearMaterial implements Material {
 
     private final double frontRatio;
     private final double backRatio;
 
-    public DialectricMaterial(double indexOfRefraction) {
+    public ClearMaterial(double indexOfRefraction) {
         this.frontRatio = 1.0 / indexOfRefraction;
         this.backRatio = indexOfRefraction;
     }
 
     @Override
-    public Vector computeAttenuation(HitDetails hit) {
-        return WHITE;
-    }
-
-    @Override
-    public Vector computeBounce(HitDetails hit) {
-        double ratio = hit.front() ? frontRatio : backRatio;
-        return refract(hit.ray().direction(), hit.normal(), ratio);
+    public HitColor computeHitColor(MaterialParams params) {
+        double ratio = params.front() ? frontRatio : backRatio;
+        Vector bounce = refract(params.incoming(), params.normal(), ratio);
+        return HitColor.bounced(WHITE, bounce);
     }
 
     private Vector refract(Vector incoming, Vector normal, double ratio) {
@@ -38,11 +40,13 @@ public class DialectricMaterial implements Material {
         boolean cannotRefract = ratio * sin > 1.0;
 
         // WTF if we negate the reflectance check, it looks a LOT more like glass
+        Vector result = null;
         if (cannotRefract || reflectance(cos, ratio) > random(0.0, 1.0)) {
-            return incoming.reflect(normal, 0.0);
+            result = incoming.reflect(normal, 0.0);
         } else {
-            return refract(incoming, normal, cos, ratio);
+            result = refract(incoming, normal, cos, ratio);
         }
+        return result;
     }
 
     /**
@@ -59,8 +63,8 @@ public class DialectricMaterial implements Material {
      * @return refraction based on Snell's law
      */
     private Vector refract(Vector incoming, Vector normal, double cos, double ratio) {
-        Vector outPerp = incoming.plus(normal.mul(cos)).mul(ratio);
-        Vector outPar = normal.mul(-sqrt(abs(1.0 - outPerp.square())));
-        return outPerp.plus(outPar);
+        Mector result = new Mector(normal).mul(cos).plus(incoming).mul(ratio);
+        double factor = -sqrt(abs(1.0 - result.square()));
+        return result.plusTimes(normal, factor).toVector();
     }
 }

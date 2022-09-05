@@ -2,10 +2,8 @@ package com.epeters.raytrace;
 
 import com.epeters.raytrace.hittables.BoundingVolume;
 import com.epeters.raytrace.hittables.Hit;
-import com.epeters.raytrace.hittables.HitDetails;
+import com.epeters.raytrace.hittables.HitColor;
 import com.epeters.raytrace.hittables.Hittable;
-import com.epeters.raytrace.hittables.HittableList;
-import com.epeters.raytrace.materials.Material;
 import com.epeters.raytrace.utils.Vector;
 
 import java.util.function.Function;
@@ -13,10 +11,9 @@ import java.util.function.Function;
 import static com.epeters.raytrace.utils.Utils.BLACK;
 import static com.epeters.raytrace.utils.Utils.random;
 import static com.epeters.raytrace.utils.Utils.sqrt;
-import static com.epeters.raytrace.utils.Vector.ORIGIN;
 import static com.epeters.raytrace.utils.Vector.vec;
 
-public class Tracer {
+public final class Tracer {
 
     private final int samplesPerPixel;
     private final int bouncesPerPixel;
@@ -26,14 +23,14 @@ public class Tracer {
     private final int imageWidth;
     private final int imageHeight;
     private final Function<Ray,Vector> backgroundColor;
-    private final Function<HitDetails,Vector> defaultColor;
+    private final Vector defaultColor;
 
     public Tracer(SceneConfig config) {
         this.samplesPerPixel = config.samplesPerPixel;
         this.bouncesPerPixel = config.bouncesPerPixel;
         this.sampleScale = 1.0 / samplesPerPixel;
         this.camera = new Camera(config);
-        this.world = config.useBoundingVolume ? BoundingVolume.from(config) : new HittableList(config);
+        this.world = BoundingVolume.from(config);
         this.imageWidth = config.imageWidth;
         this.imageHeight = (int)(imageWidth / config.aspectRatio);
         this.backgroundColor = config.backgroundColor;
@@ -88,28 +85,11 @@ public class Tracer {
         }
 
         // if we do have a hit, let's find out more
-        HitDetails details = hit.solid().computeHitDetails(hit);
-
-        // if there is no material, we'll just compute a default color
-        Material material = details.solid().getMaterial();
-        if (material == null) {
-            return defaultColor.apply(details);
-        }
-
-        // if there is a material, we'll use it to compute onward lighting info
-        Vector emission = material.computeEmission(details);
-        Vector attenuation = material.computeAttenuation(details);
-        Vector bounce = material.computeBounce(details);
-
-        Vector result = ORIGIN;
-        if (emission != null) {
-            result = result.plus(emission);
-        }
-        if (attenuation != null && bounce != null) {
-            Ray bounceRay = new Ray(details.point(), bounce);
-            Vector bounceColor = computeColor(bounceRay, bouncesRemaining - 1);
-            result = result.plus(attenuation.mul(bounceColor));
-        }
-        return result;
+        Vector point = hit.ray().at(hit.t());
+        Vector incoming = hit.ray().direction();
+        HitColor color = hit.color().apply(point, incoming);
+        return color == null
+                ? defaultColor
+                : color.combine(bounce -> computeColor(new Ray(point, bounce), bouncesRemaining-1));
     }
 }

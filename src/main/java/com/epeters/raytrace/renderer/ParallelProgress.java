@@ -36,6 +36,7 @@ public final class ParallelProgress {
 
         double currentTime = System.currentTimeMillis();
         double thisIntervalTime = currentTime - lastIntervalTime;
+        double totalTime = currentTime - startTime;
         lastIntervalTime = currentTime;
 
         int pixelsThisInterval = pixelsLastInterval.getAndSet(0);
@@ -47,7 +48,8 @@ public final class ParallelProgress {
 
         int pctComplete = (int)(pixelsComplete * 100.0 / pixelsTotal);
         double pixelsPerMinute = pixelsThisInterval / (thisIntervalTime / 60000.0);
-        double minutesLeft = (pixelsTotal - pixelsComplete) / pixelsPerMinute;
+        double pixelsPerMinuteAvg = pixelsComplete / (totalTime / 60000.0);
+        double minutesLeft = (pixelsTotal - pixelsComplete) / pixelsPerMinuteAvg;
         System.err.printf("%d pixels (%d%%) complete at %.0f pixels/min -> %.3f min remaining (%.3f%% free memory)%n",
                 pixelsComplete,
                 pctComplete,

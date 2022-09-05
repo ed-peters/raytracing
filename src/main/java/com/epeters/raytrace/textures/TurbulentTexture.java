@@ -1,7 +1,6 @@
 package com.epeters.raytrace.textures;
 
 import com.epeters.raytrace.utils.Perlin;
-import com.epeters.raytrace.utils.TextureCoordinates;
 import com.epeters.raytrace.utils.Vector;
 
 import static java.lang.Math.sin;
@@ -11,7 +10,7 @@ import static java.lang.Math.sin;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#perlinnoise/introducingturbulence">guide</a>
  */
-public class TurbulentTexture implements Texture {
+public final class TurbulentTexture implements Texture {
 
     private final Perlin perlin;
     private final Vector base;
@@ -26,7 +25,7 @@ public class TurbulentTexture implements Texture {
     }
 
     @Override
-    public Vector calculateColor(Vector point, TextureCoordinates coords) {
+    public Vector calculateColor(Vector point, double u, double v) {
         double n = 0.5 * sin(scale * point.z() + 10.0 * perlin.turbulence(point, depth));
         return base.mul(n);
     }

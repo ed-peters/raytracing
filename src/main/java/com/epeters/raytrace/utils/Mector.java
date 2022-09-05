@@ -41,6 +41,20 @@ public final class Mector {
         return this;
     }
 
+    public Mector plusTimes(Vector v, double factor) {
+        x += v.x() * factor;
+        y += v.y() * factor;
+        z += v.z() * factor;
+        return this;
+    }
+
+    public Mector plusTimes(Vector v, Vector f) {
+        x += v.x() * f.x();
+        y += v.y() * f.y();
+        z += v.z() * f.z();
+        return this;
+    }
+
     public Mector minus(Vector v) {
         x -= v.x();
         y -= v.y();

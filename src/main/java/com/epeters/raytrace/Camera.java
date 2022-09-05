@@ -1,5 +1,6 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 
 import static java.lang.Math.tan;
@@ -10,7 +11,7 @@ import static com.epeters.raytrace.utils.Utils.randomVectorInUnitDisc;
  * Represents the camera in the scene. Knows its position and dimensional details,
  * and how to calculate a ray through the focal image.
  */
-public class Camera {
+public final class Camera {
 
     private final double lensRadius;
     public final Vector origin;
@@ -41,17 +42,20 @@ public class Camera {
     }
 
     public Ray computeRay(double s, double t) {
-        Vector origin = this.origin;
-        Vector direction = lowerLeft
-                .plus(horizontal.mul(s))
-                .plus(vertical.mul(t))
+        Mector o = new Mector(origin);
+        Mector d = new Mector(lowerLeft)
+                .plusTimes(horizontal, s)
+                .plusTimes(vertical, t)
                 .minus(origin);
         if (lensRadius > 0.0) {
             Vector rando = randomVectorInUnitDisc().mul(lensRadius);
-            Vector offset = u.mul(rando.x()).plus(v.mul(rando.y()));
-            origin = origin.plus(offset);
-            direction = direction.minus(offset);
+            Vector f = new Mector()
+                    .plusTimes(u, rando.x())
+                    .plusTimes(v, rando.y())
+                    .toVector();
+            o.plus(f);
+            d.minus(f);
         }
-        return new Ray(origin, direction);
+        return new Ray(o.toVector(), d.toVector());
     }
 }

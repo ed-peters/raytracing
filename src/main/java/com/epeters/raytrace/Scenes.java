@@ -1,20 +1,34 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.materials.LightedMaterial;
+import com.epeters.raytrace.hittables.BoundingVolume;
+import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.materials.Material;
-import com.epeters.raytrace.solids.XYRectangle;
+import com.epeters.raytrace.solids.Solid;
 import com.epeters.raytrace.textures.CheckeredTexture;
-import com.epeters.raytrace.textures.ImageTexture;
 import com.epeters.raytrace.textures.Texture;
 import com.epeters.raytrace.utils.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.epeters.raytrace.hittables.Hittable.rotateY;
+import static com.epeters.raytrace.hittables.Hittable.translate;
 import static com.epeters.raytrace.materials.Material.light;
-import static com.epeters.raytrace.solids.Solid.rect;
+import static com.epeters.raytrace.solids.Solid.box;
+import static com.epeters.raytrace.solids.Solid.fog;
+import static com.epeters.raytrace.solids.Solid.rectXY;
+import static com.epeters.raytrace.solids.Solid.rectXZ;
+import static com.epeters.raytrace.solids.Solid.rectYZ;
+import static com.epeters.raytrace.textures.Texture.checker;
+import static com.epeters.raytrace.textures.Texture.image;
+import static com.epeters.raytrace.textures.Texture.noise;
+import static com.epeters.raytrace.textures.Texture.solid;
+import static com.epeters.raytrace.utils.Utils.BLACK;
 import static com.epeters.raytrace.utils.Utils.DARK_GREEN;
-import static com.epeters.raytrace.utils.Utils.DARK_PINK;
 import static com.epeters.raytrace.utils.Utils.MID_GRAY;
 import static com.epeters.raytrace.utils.Utils.WHITE;
 import static com.epeters.raytrace.utils.Utils.random;
+import static com.epeters.raytrace.utils.Utils.randomVector;
 import static com.epeters.raytrace.utils.Utils.randomVectorInUnitCube;
 import static com.epeters.raytrace.utils.Vector.ORIGIN;
 import static com.epeters.raytrace.utils.Vector.vec;
@@ -24,10 +38,17 @@ import static com.epeters.raytrace.materials.Material.lambertian;
 import static com.epeters.raytrace.materials.Material.metal;
 import static com.epeters.raytrace.materials.Material.dialectric;
 import static com.epeters.raytrace.solids.Solid.sphere;
+import static com.epeters.raytrace.textures.Texture.turbulence;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 
 public class Scenes {
+
+    public static final Material M_MID_GRAY = lambertian(MID_GRAY);
+    public static final Material M_RED = lambertian(RED);
+    public static final Material M_BLUE = lambertian(BLUE);
+    public static final Material M_NOISE = lambertian(turbulence(WHITE, 4.0, 7));
+    public static final Material M_LIGHT = light(vec(4.0, 4.0, 4.0));
 
     // ====================================================================================
     // two balls
@@ -36,24 +57,96 @@ public class Scenes {
     public static SceneConfig twoGrayBalls() {
 
         SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(0.0, 0.0, -1.0), 0.5, lambertian(MID_GRAY)));
-        config.add(sphere(vec(0.0, -100.5, -1.0), 100.0, lambertian(MID_GRAY)));
+        config.add(sphere(vec(0.0, 0.0, -1.0), 0.5, M_MID_GRAY));
+        config.add(sphere(vec(0.0, -100.5, -1.0), 100.0, M_MID_GRAY));
         return config;
     }
 
-    public static SceneConfig redBox() {
+    // ====================================================================================
+    // lights
+    // ====================================================================================
 
-        Texture noise = Texture.turbulence(WHITE, 4.0, 7);
-        Texture earth = new ImageTexture("/earth.jpg");
-
+    public static SceneConfig lightedMarble() {
         SceneConfig config = new SceneConfig();
-        config.add(rect(-1.0, -1.0, 1.0, 1.0, -3.0, light(vec(6.0, 6.0, 6.0))));
-        config.add(sphere(vec(0.0, 2.0, 1.0), 2.0, lambertian(earth)));
-        config.add(sphere(vec(0.0, -100.5, 1.0), 100.0, lambertian(MID_GRAY)));
-        config.position = vec(11.0, 2.0, 2.0);
-        config.target = ORIGIN;
+        config.add(rectXY(1.0, 1.0, 3.0, 3.0, -4.0, M_LIGHT));
+        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, M_NOISE));
+        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, M_NOISE));
+        config.position = vec(26.0, 3.0, 6.0);
+        config.target = vec(0.0, 2.0, 0.0);
         config.fieldOfView = 20.0;
         config.backgroundColor = (r) -> ORIGIN;
+        return config;
+    }
+
+    // ====================================================================================
+    // boxes
+    // ====================================================================================
+
+    public static SceneConfig grayBox() {
+
+        SceneConfig config = new SceneConfig();
+
+        Hittable box = box(vec(-1.0, -1.0, -3.0), vec(1.0, 1.0, -4.0), M_MID_GRAY);
+        box = rotateY(box, 45.0);
+
+        config.add(box);
+        config.position = vec(2.0, 2.0, 0.0);
+        config.target = vec(0.0, 0.0, -3.5);
+        return config;
+    }
+
+    public static SceneConfig cornellBox() {
+
+        Material red = lambertian(solid(vec(0.65, 0.05, 0.05)));
+        Material white = lambertian(solid(vec(0.73, 0.73, 0.73)));
+        Material green = lambertian(solid(vec(0.12, 0.45, 0.15)));
+        Material light = light(vec(15.0, 15.0, 15.0));
+
+        SceneConfig config = new SceneConfig();
+        config.add(rectYZ(0.0, 0.0, 555.0, 555.0, 555.0, green));
+        config.add(rectYZ(0.0, 0.0, 555.0, 555.0, 0.0, red));
+        config.add(rectXZ(0.0, 0.0, 555.0, 555.0, 0.0, white));
+        config.add(rectXZ(0.0, 0.0, 555.0, 555.0, 555.0, white));
+        config.add(rectXY(0.0, 0, 555.0, 555.0, 555.0, white));
+        config.add(rectXZ(200.0, 150.0, 355.0, 305.0, 554.0, light));
+        config.aspectRatio = 1.0;
+        config.position = vec(278.0, 278.0, -800.0);
+        config.target = vec(278.0, 278.0, 0.0);
+        config.fieldOfView = 40.0;
+        config.backgroundColor = (r) -> BLACK;
+        return config;
+    }
+
+    public static SceneConfig cornellBoxWithObjects() {
+
+        Material red = lambertian(solid(vec(0.65, 0.05, 0.05)));
+        Material white = lambertian(solid(vec(0.73, 0.73, 0.73)));
+        Material green = lambertian(solid(vec(0.12, 0.45, 0.15)));
+        Material light = light(vec(15.0, 15.0, 15.0));
+
+        SceneConfig config = new SceneConfig();
+
+        Hittable box1 = box(vec(0, 0.0, 0), vec(165.0, 330.0, 165.0), white);
+        box1 = rotateY(box1, 15.0);
+        box1 = translate(box1, vec(265.0, 0.0, 295.0));
+        config.add(fog(box1, 0.01, BLACK));
+
+        Hittable box2 = box(vec(0, 0.0, 0), vec(165.0, 165.0, 165.0), white);
+        box2 = rotateY(box2, -18.0);
+        box2 = translate(box2, vec(130.0, 0.0, 65.0));
+        config.add(fog(box2, 0.01, WHITE));
+
+        config.add(rectYZ(0.0, 0.0, 555.0, 555.0, 555.0, green));
+        config.add(rectYZ(0.0, 0.0, 555.0, 555.0, 0.0, red));
+        config.add(rectXZ(0.0, 0.0, 555.0, 555.0, 0.0, white));
+        config.add(rectXZ(0.0, 0.0, 555.0, 555.0, 555.0, white));
+        config.add(rectXY(0.0, 0, 555.0, 555.0, 555.0, white));
+        config.add(rectXZ(200.0, 150.0, 355.0, 305.0, 554.0, light));
+        config.aspectRatio = 1.0;
+        config.position = vec(278.0, 278.0, -800.0);
+        config.target = vec(278.0, 278.0, 0.0);
+        config.fieldOfView = 40.0;
+        config.backgroundColor = (r) -> BLACK;
         return config;
     }
 
@@ -116,8 +209,8 @@ public class Scenes {
         double r = cos(PI / 4.0);
 
         SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(-r, 0.0, -1.0), r, lambertian(BLUE)));
-        config.add(sphere(vec(r, 0.0, -1.0), r, lambertian(RED)));
+        config.add(sphere(vec(-r, 0.0, -1.0), r, M_BLUE));
+        config.add(sphere(vec(r, 0.0, -1.0), r, M_RED));
         config.fieldOfView = 90.0;
         config.aspectRatio = 3.0 / 2.0;
         return config;
@@ -128,12 +221,10 @@ public class Scenes {
     // ====================================================================================
 
     public static SceneConfig closeupCheckeredSpheres() {
-
-        Texture checker = Texture.checker(WHITE, DARK_GREEN);
-
+        Material checks = lambertian(checker(WHITE, DARK_GREEN));
         SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(0.0, -10.0, 0.0), 10.0, lambertian(checker)));
-        config.add(sphere(vec(0.0, 10.0, 0.0), 10.0, lambertian(checker)));
+        config.add(sphere(vec(0.0, -10.0, 0.0), 10.0, checks));
+        config.add(sphere(vec(0.0, 10.0, 0.0), 10.0, checks));
         config.position = vec(13.0, 2.0, 3.0);
         config.target = vec(0.0, 0.0, 0.0);
         config.fieldOfView = 20.0;
@@ -145,12 +236,9 @@ public class Scenes {
     // ====================================================================================
 
     public static SceneConfig noisySphere() {
-
-        Texture noise = Texture.noise(WHITE, 4.0);
-
         SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(noise)));
-        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, lambertian(noise)));
+        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, M_NOISE));
+        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, M_NOISE));
         config.position = vec(13,2,3);
         config.target = vec(0,0,0);
         config.fieldOfView = 20.0;
@@ -158,30 +246,13 @@ public class Scenes {
     }
 
     public static SceneConfig marbleSphere() {
-
-        Texture noise = Texture.turbulence(WHITE, 4.0, 7);
-
+        Material marble = lambertian(turbulence(WHITE, 4.0, 7));
         SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(noise)));
-        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, lambertian(noise)));
+        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, marble));
+        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, marble));
         config.position = vec(13,2,3);
         config.target = vec(0,0,0);
         config.fieldOfView = 20.0;
-        return config;
-    }
-
-    public static SceneConfig litMarble() {
-
-        Texture noise = Texture.turbulence(WHITE, 4.0, 7);
-
-        SceneConfig config = new SceneConfig();
-        config.add(rect(3, 5, 1, 3, -2, lambertian(RED))); // light(vec(4.0, 4.0, 4.0))));
-        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(noise)));
-//        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, lambertian(noise)));
-        config.position = vec(26,3,6);
-        config.target = vec(3,5,1);
-        config.fieldOfView = 20.0;
-//        config.backgroundColor = (r) -> ORIGIN;
         return config;
     }
 
@@ -190,29 +261,11 @@ public class Scenes {
     // ====================================================================================
 
     public static SceneConfig earth() {
-
-        Texture earth = new ImageTexture("/earth.jpg");
-
         SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(0.0, 0.0, 0.0), 2.0, lambertian(earth)));
+        config.add(sphere(vec(0.0, 0.0, 0.0), 2.0, lambertian(image("/earth.jpg"))));
         config.position = vec(13,2,3);
         config.target = vec(0,0,0);
         config.fieldOfView = 20.0;
-        return config;
-    }
-
-    public static SceneConfig lightedScene() {
-
-        Texture noise = Texture.turbulence(WHITE, 4.0, 7);
-
-        SceneConfig config = new SceneConfig();
-        config.add(sphere(vec(0.0, -1000.0, 0.0), 1000.0, lambertian(noise)));
-        config.add(sphere(vec(0.0, 2.0, 0.0), 2.0, lambertian(noise)));
-        config.add(new XYRectangle(light(vec(4.0, 4.0, 4.0)), 3.0, 5.0, 1.0, 3.0, -2.0));
-        config.position = vec(26.0, 3.0, 6.0);
-        config.target = vec(0.0,2.0,0.0);
-        config.fieldOfView = 20.0;
-        config.backgroundColor = (h) -> ORIGIN;
         return config;
     }
 
@@ -259,9 +312,69 @@ public class Scenes {
         config.position = vec(13.0, 2.0, 3.0);
         config.target = ORIGIN;
         config.up = vec(0.0, 1.0, 0.0);
-        config.useBoundingVolume = true;
         config.aspectRatio = 3.0 / 2.0;
         return config;
     }
 
+    // ====================================================================================
+    // finale
+    // ====================================================================================
+
+    public static SceneConfig finale() {
+
+        SceneConfig config = new SceneConfig();
+
+        Material light = light(vec(7.0, 7.0, 7.0));
+        config.add(rectXZ(100, 220, 300, 420, 550, light));
+
+        List<Hittable> boxes = new ArrayList<>();
+        Material ground = lambertian(vec(0.48, 0.83, 0.53));
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+
+                double w = 100.0;
+
+                double x0 = -1000.0 + i * w;
+                double y0 = 0.0;
+                double z0 = -1000.0 + j * w;
+
+                double x1 = x0 + w;
+                double y1 = random(1.0, 101.0);
+                double z1 = z0 + w;
+
+                config.add(box(vec(x0, y0, z0), vec(x1, y1, z1), ground));
+            }
+        }
+
+        config.add(sphere(vec(400, 400, 200), 50, lambertian(vec(0.7, 0.3, 0.1))));
+        config.add(sphere(vec(260, 150, 45), 50, dialectric(1.5)));
+        config.add(sphere(vec(0, 150, 145), 50, metal(vec(0.8, 0.8, 0.9), 1.0)));
+        config.add(sphere(vec(400, 200, 400), 100, lambertian(image("/earth.jpg"))));
+        config.add(sphere(vec(220, 280, 300), 80, lambertian(noise(WHITE, 0.1))));
+
+        Solid b1 = sphere(vec(360, 150, 145), 70, dialectric(1.5));
+        config.add(b1);
+        config.add(fog(b1, 0.2, vec(0.2, 0.4, 0.9)));
+//
+//        Solid b2 = sphere(vec(0, 0, 0), 5000, dialectric(1.5));
+//        config.add(fog(b2, 0.0001, WHITE));
+
+        Material offwhite = lambertian(vec(0.73, 0.73, 0.73));
+        List<Solid> boxes2 = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            boxes2.add(sphere(randomVector(0, 165), 10, offwhite));
+        }
+        Hittable list = BoundingVolume.from(boxes2);
+        list = translate(list, vec(-100, 270, 395));
+        list = rotateY(list, 15);
+        config.add(list);
+
+        config.aspectRatio = 16.0 / 9.0;
+        config.backgroundColor = (r) -> BLACK;
+        config.position = vec(478, 300, -600);
+        config.target = vec(278, 278, 0);
+        config.fieldOfView = 40.0;
+
+        return config;
+    }
 }

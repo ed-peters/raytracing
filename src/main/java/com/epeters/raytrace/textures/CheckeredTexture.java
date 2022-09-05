@@ -1,6 +1,5 @@
 package com.epeters.raytrace.textures;
 
-import com.epeters.raytrace.utils.TextureCoordinates;
 import com.epeters.raytrace.utils.Vector;
 
 import static java.lang.Math.sin;
@@ -10,7 +9,7 @@ import static java.lang.Math.sin;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#solidtextures/acheckertexture">guide</a>
  */
-public class CheckeredTexture implements Texture {
+public final class CheckeredTexture implements Texture {
 
     private final Texture even;
     private final Texture odd;
@@ -25,11 +24,11 @@ public class CheckeredTexture implements Texture {
     }
 
     @Override
-    public Vector calculateColor(Vector point, TextureCoordinates coords) {
+    public Vector calculateColor(Vector point, double u, double v) {
         double sx = sin(10.0 * point.x());
         double sy = sin(10.0 * point.y());
         double sz = sin(10.0 * point.z());
         double sines = sx * sy * sz;
-        return (sines < 0) ? odd.calculateColor(point, coords) : even.calculateColor(point, coords);
+        return (sines < 0) ? odd.calculateColor(point, u, v) : even.calculateColor(point, u, v);
     }
 }

@@ -16,51 +16,47 @@ import static com.epeters.raytrace.utils.Utils.randomComponent;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/thebvhnodeclass">guide</a>
  */
-public class BoundingVolume implements Hittable {
+public  final class BoundingVolume extends Hittable {
 
     private final Hittable left;
     private final Hittable right;
-    private final BoundingBox bounds;
 
     public BoundingVolume(Hittable left) {
+        super(left.getBounds());
         this.left = left;
         this.right = null;
-        this.bounds = left.getBounds();
     }
 
     public BoundingVolume(Hittable left, Hittable right) {
+        super(BoundingBox.from(Arrays.asList(left, right)));
         this.left = left;
         this.right = right;
-        this.bounds = right != null
-                ? new BoundingBox(Arrays.asList(left.getBounds(), right.getBounds()))
-                : left.getBounds();
     }
 
     @Override
-    public BoundingBox getBounds() {
-        return bounds;
-    }
-
-    @Override
-    public Hit hit(Ray ray, double tmin, double tmax) {
-
-        if (!getBounds().hit(ray, tmin, tmax)) {
-            return null;
-        }
-
+    protected Hit computeHit(Ray ray, double tmin, double tmax) {
         Hit leftHit = left.hit(ray, tmin, tmax);
         if (right == null) {
             return leftHit;
         }
-
         Hit rightHit = right.hit(ray, tmin, leftHit == null ? tmax : leftHit.t());
         return (rightHit == null) ? leftHit : rightHit;
     }
 
+    public static BoundingVolume from(Hittable hittable) {
+        if (hittable instanceof BoundingVolume) {
+            return (BoundingVolume) hittable;
+        }
+        return new BoundingVolume(hittable);
+    }
+
     public static BoundingVolume from(List<? extends Hittable> hittables) {
 
+        if (hittables.size() == 0) {
+            throw new IllegalArgumentException("empty list is not allowed");
+        }
         if (hittables.size() == 1) {
-            return new BoundingVolume(hittables.get(0));
+            return from(hittables.get(0));
         }
 
         final int c = randomComponent();

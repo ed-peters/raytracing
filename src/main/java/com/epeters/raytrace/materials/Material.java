@@ -1,6 +1,6 @@
 package com.epeters.raytrace.materials;
 
-import com.epeters.raytrace.hittables.HitDetails;
+import com.epeters.raytrace.hittables.HitColor;
 import com.epeters.raytrace.utils.Vector;
 import com.epeters.raytrace.textures.Texture;
 
@@ -10,9 +10,7 @@ import com.epeters.raytrace.textures.Texture;
  */
 public interface Material {
 
-    default Vector computeEmission(HitDetails hit) { return null; }
-    Vector computeAttenuation(HitDetails hit);
-    Vector computeBounce(HitDetails hit);
+    HitColor computeHitColor(MaterialParams params);
 
     static Material lambertian(Vector color) {
         return new LambertianMaterial(color);
@@ -27,7 +25,7 @@ public interface Material {
     }
 
     static Material dialectric(double backRatio) {
-        return new DialectricMaterial(backRatio);
+        return new ClearMaterial(backRatio);
     }
 
     static Material light(Vector color) { return new LightedMaterial(Texture.solid(color)); }

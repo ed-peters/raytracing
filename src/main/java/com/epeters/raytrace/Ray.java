@@ -1,5 +1,6 @@
 package com.epeters.raytrace;
 
+import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 
 import static com.epeters.raytrace.utils.Vector.ORIGIN;
@@ -24,6 +25,6 @@ public record Ray(Vector origin, Vector direction) {
     }
 
     public Vector at(double t) {
-        return origin.plus(direction.mul(t));
+        return new Mector(origin).plusTimes(direction, t).toVector();
     }
 }

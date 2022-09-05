@@ -12,14 +12,14 @@ import java.util.List;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/axis-alignedboundingboxes(aabbs)">guide</a>
  */
-public class BoundingBox {
+public final class BoundingBox {
 
     private final Vector min;
     private final Vector max;
 
     public BoundingBox(Vector min, Vector max) {
-        this.min = min;
-        this.max = max;
+        this.min = min.minWith(max);
+        this.max = max.maxWith(min);
     }
 
     public Vector getMin() {
@@ -30,18 +30,7 @@ public class BoundingBox {
         return max;
     }
 
-    public BoundingBox(List<BoundingBox> boxes) {
-        Vector currMin = boxes.get(0).min;
-        Vector currMax = boxes.get(0).max;
-        for (int i=1; i<boxes.size(); i++) {
-            currMin = currMin.minWith(boxes.get(i).min);
-            currMax = currMax.maxWith(boxes.get(i).max);
-        }
-        this.min = currMin;
-        this.max = currMax;
-    }
-
-    public boolean hit(Ray ray, double tmin, double tmax) {
+    public boolean intersects(Ray ray, double tmin, double tmax) {
         for (int a=0; a<3; a++) {
 
             Vector ro = ray.origin();
@@ -57,12 +46,26 @@ public class BoundingBox {
                 t0 = tmp;
             }
 
-            tmin = t0 > tmin ? t0 : tmin;
-            tmax = t1 < tmax ? t1 : tmax;
+            tmin = Math.max(t0, tmin);
+            tmax = Math.min(t1, tmax);
             if (tmax <= tmin) {
                 return false;
             }
         }
         return true;
+    }
+
+    public static BoundingBox from(List<? extends Hittable> hittables) {
+        Vector currMin = Vector.MAX;
+        Vector currMax = Vector.MIN;
+        for (Hittable hittable : hittables) {
+            BoundingBox bounds = hittable.getBounds();
+            if (bounds == null) {
+                return null;
+            }
+            currMin = currMin.minWith(bounds.min);
+            currMax = currMax.maxWith(bounds.max);
+        }
+        return new BoundingBox(currMin, currMax);
     }
 }

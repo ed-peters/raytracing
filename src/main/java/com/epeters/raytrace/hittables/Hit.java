@@ -1,9 +1,9 @@
 package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.solids.Solid;
+import com.epeters.raytrace.utils.Vector;
 
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 
 /**
  * Represents the intersection of a ray with an object. We don't compute all the details (e.g.
@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  *
  * @param ray the ray in question
  * @param t the distance along the ray of the intersection
- * @param solid the object that was intersected
+ * @param color something that can compute the color at a point
  */
-public record Hit(Ray ray, double t, Solid solid) {
+public record Hit(Ray ray, double t, BiFunction<Vector,Vector,HitColor> color) {
 }

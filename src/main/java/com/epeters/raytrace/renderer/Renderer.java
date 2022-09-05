@@ -12,15 +12,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class Renderer {
+public final class Renderer {
 
     private final Tracer tracer;
     private final File file;
@@ -89,7 +87,6 @@ public class Renderer {
         BufferedImage image = new BufferedImage(tracer.getImageWidth(), tracer.getImageHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y=0; y<rows.size(); y++) {
             Vector [] row = rows.get(y);
-            System.err.println(y);
             for (int x=0; x<row.length; x++) {
                 Vector pixel = row[x];
                 int rgb = pixel.toRgb();

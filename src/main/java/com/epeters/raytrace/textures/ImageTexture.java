@@ -1,6 +1,5 @@
 package com.epeters.raytrace.textures;
 
-import com.epeters.raytrace.utils.TextureCoordinates;
 import com.epeters.raytrace.utils.Vector;
 
 import javax.imageio.ImageIO;
@@ -15,7 +14,7 @@ import static com.epeters.raytrace.utils.Vector.vec;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#imagetexturemapping">guide</a>
  */
-public class ImageTexture implements Texture {
+public final class ImageTexture implements Texture {
 
     private final BufferedImage image;
     private final int width;
@@ -32,14 +31,14 @@ public class ImageTexture implements Texture {
     }
 
     @Override
-    public Vector calculateColor(Vector point, TextureCoordinates coords) {
+    public Vector calculateColor(Vector point, double u, double v) {
 
-        int i = (int) (clamp(coords.u(), 0.0, 1.0) * width);
+        int i = (int) (clamp(u, 0.0, 1.0) * width);
         if (i > width) {
             i = width - 1;
         }
 
-        int j = (int) (clamp((1.0 - coords.v()), 0.0, 1.0) * height);
+        int j = (int) (clamp((1.0 - v), 0.0, 1.0) * height);
         if (j > height) {
             j = height - 1;
         }
