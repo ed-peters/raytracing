@@ -181,7 +181,7 @@ public class Scenes {
         config.add(rect(XZ, 0.0, 0.0, 555.0, 555.0, 0.0, white));
         config.add(rect(XZ, 0.0, 0.0, 555.0, 555.0, 555.0, white));
         config.add(rect(XY, 0.0, 0, 555.0, 555.0, 555.0, white));
-        config.add(rect(XZ, 200.0, 150.0, 355.0, 305.0, 554.0, light));
+        config.add(rect(XZ, 213.0, 227.0, 343.0, 332.0, 554.0, light));
         config.aspectRatio = 1.0;
         config.position = vec(278.0, 278.0, -800.0);
         config.target = vec(278.0, 278.0, 0.0);

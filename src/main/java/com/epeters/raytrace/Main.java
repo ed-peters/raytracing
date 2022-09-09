@@ -10,8 +10,8 @@ public class Main {
         SceneConfig config = Scenes.cornellBoxWithObjects(false);
         config.imageWidth = 500;
         config.aspectRatio = 1.0;
-        config.samplesPerPixel = 50;
-        config.bouncesPerPixel = 10;
+        config.samplesPerPixel = 200;
+        config.bouncesPerPixel = 50;
 
         int threads = Runtime.getRuntime().availableProcessors() - 1;
         String path = System.getProperty("user.home") + "/Desktop/trace.png";
