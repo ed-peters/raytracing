@@ -151,7 +151,7 @@ public class Scenes {
         return config;
     }
 
-    public static SceneConfig cornellBoxWithObjects() {
+    public static SceneConfig cornellBoxWithObjects(boolean fog) {
 
         Material red = lambertian(solid(vec(0.65, 0.05, 0.05)));
         Material white = lambertian(solid(vec(0.73, 0.73, 0.73)));
@@ -163,12 +163,18 @@ public class Scenes {
         Hittable box1 = box(vec(0, 0.0, 0), vec(165.0, 330.0, 165.0), white);
         box1 = box1.rotate(Axis.Y, 15.0);
         box1 = box1.translate(vec(265.0, 0.0, 295.0));
-        config.add(fog(box1, 0.01, BLACK));
+        if (fog) {
+            box1 = fog(box1, 0.01, BLACK);
+        }
+        config.add(box1);
 
         Hittable box2 = box(vec(0, 0.0, 0), vec(165.0, 165.0, 165.0), white);
         box2 = box2.rotate(Axis.Y, -18.0);
         box2 = box2.translate(vec(130.0, 0.0, 65.0));
-        config.add(fog(box2, 0.01, WHITE));
+        if (fog) {
+            box2 = fog(box2, 0.01, WHITE);
+        }
+        config.add(box2);
 
         config.add(rect(YZ, 0.0, 0.0, 555.0, 555.0, 555.0, green));
         config.add(rect(YZ, 0.0, 0.0, 555.0, 555.0, 0.0, red));

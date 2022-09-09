@@ -7,12 +7,13 @@ public class Main {
 
     public static void main(String [] args) {
 
-        SceneConfig config = Scenes.gourd();
-        config.imageWidth = 600;
-        config.samplesPerPixel = 10;
+        SceneConfig config = Scenes.cornellBoxWithObjects(false);
+        config.imageWidth = 500;
+        config.aspectRatio = 1.0;
+        config.samplesPerPixel = 50;
         config.bouncesPerPixel = 10;
 
-        int threads = 14; // Runtime.getRuntime().availableProcessors() - 1;
+        int threads = Runtime.getRuntime().availableProcessors() - 1;
         String path = System.getProperty("user.home") + "/Desktop/trace.png";
 
         Tracer tracer = new Tracer(config);
