@@ -1,26 +1,29 @@
 package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.utils.Vector;
 
-public final class TranslatedHittable extends Hittable {
+public abstract class HittableTransform implements Hittable {
 
+    private final Box bounds;
     private final Hittable target;
-    private final Vector offset;
 
-    public TranslatedHittable(Hittable target, Vector offset) {
-        super(makeBounds(target.getBounds(), offset));
+    protected HittableTransform(Box bounds, Hittable target) {
+        this.bounds = bounds;
         this.target = target;
-        this.offset = offset;
     }
 
-    @Override
-    protected Hit computeHit(Ray originalRay, double tmin, double tmax) {
+    public Hit intersect(Ray originalRay, double tmin, double tmax) {
+
+        if (bounds.doesNotIntersect(originalRay, tmin, tmax)) {
+            return null;
+        }
 
         // we transform the incoming ray into the new coordinate system and
         // then apply the target's intersection logic
         Ray transformedRay = transformRay(originalRay);
-        Hit transformedHit = target.hit(transformedRay, tmin, tmax);
+        Hit transformedHit = target.intersect(transformedRay, tmin, tmax);
         if (transformedHit == null) {
             return null;
         }
@@ -33,20 +36,9 @@ public final class TranslatedHittable extends Hittable {
         });
     }
 
-    private Ray transformRay(Ray originalRay) {
+    protected Ray transformRay(Ray originalRay) {
         return new Ray(transformPoint(originalRay.origin()), originalRay.direction());
     }
 
-    private Vector transformPoint(Vector point) {
-        return point.minus(offset);
-    }
-
-    private static BoundingBox makeBounds(BoundingBox original, Vector offset) {
-        if (original == null) {
-            return null;
-        }
-        return new BoundingBox(
-                original.getMin().plus(offset),
-                original.getMax().plus(offset));
-    }
+    protected abstract Vector transformPoint(Vector point);
 }

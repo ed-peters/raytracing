@@ -1,9 +1,10 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.hittables.BoundingVolume;
+import com.epeters.raytrace.hittables.HittableVolume;
 import com.epeters.raytrace.hittables.Hit;
 import com.epeters.raytrace.hittables.HitColor;
 import com.epeters.raytrace.hittables.Hittable;
+import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 
 import java.util.function.Function;
@@ -23,18 +24,16 @@ public final class Tracer {
     private final int imageWidth;
     private final int imageHeight;
     private final Function<Ray,Vector> backgroundColor;
-    private final Vector defaultColor;
 
     public Tracer(SceneConfig config) {
         this.samplesPerPixel = config.samplesPerPixel;
         this.bouncesPerPixel = config.bouncesPerPixel;
         this.sampleScale = 1.0 / samplesPerPixel;
         this.camera = new Camera(config);
-        this.world = BoundingVolume.from(config);
+        this.world = HittableVolume.from(config);
         this.imageWidth = config.imageWidth;
         this.imageHeight = (int)(imageWidth / config.aspectRatio);
         this.backgroundColor = config.backgroundColor;
-        this.defaultColor = config.defaultColor;
     }
 
     public int getImageWidth() {
@@ -79,7 +78,7 @@ public final class Tracer {
         }
 
         // if we don't hit, this ray will contribute the background color
-        Hit hit = world.hit(ray, 1e-8, Double.MAX_VALUE);
+        Hit hit = world.intersect(ray, 1e-8, Double.MAX_VALUE);
         if (hit == null) {
             return backgroundColor.apply(ray);
         }
@@ -88,8 +87,30 @@ public final class Tracer {
         Vector point = hit.ray().at(hit.t());
         Vector incoming = hit.ray().direction();
         HitColor color = hit.color().apply(point, incoming);
-        return color == null
-                ? defaultColor
-                : color.combine(bounce -> computeColor(new Ray(point, bounce), bouncesRemaining-1));
+        if (color == null) {
+            throw new IllegalStateException("no color available from object");
+        }
+        return combineColor(point, color, bouncesRemaining);
+    }
+
+    private Vector combineColor(Vector point, HitColor color, int bouncesRemaining) {
+
+        Vector e = color.emission();
+        Vector a = color.attenuation();
+        Vector b = color.bounce();
+
+        Mector result = new Mector();
+        if (e != null) {
+            result.plus(e);
+        }
+        if (a != null) {
+            if (b == null) {
+                result.plus(a);
+            } else {
+                Ray bounce = new Ray(point, color.bounce());
+                result.plusTimes(a, computeColor(bounce, bouncesRemaining - 1));
+            }
+        }
+        return result.toVector();
     }
 }

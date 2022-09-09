@@ -55,6 +55,13 @@ public final class Mector {
         return this;
     }
 
+    public Mector minus(double dx, double dy, double dz) {
+        x -= dx;
+        y -= dy;
+        z -= dz;
+        return this;
+    }
+
     public Mector minus(Vector v) {
         x -= v.x();
         y -= v.y();

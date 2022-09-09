@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String [] args) {
 
-        SceneConfig config = Scenes.fuzzyThreeBalls();
+        SceneConfig config = Scenes.gourd();
         config.imageWidth = 600;
         config.samplesPerPixel = 10;
         config.bouncesPerPixel = 10;
@@ -17,6 +17,6 @@ public class Main {
 
         Tracer tracer = new Tracer(config);
         Renderer renderer = new Renderer(tracer, path, threads);
-        Utils.time(() -> renderer.render());
+        Utils.time(renderer::render);
     }
 }

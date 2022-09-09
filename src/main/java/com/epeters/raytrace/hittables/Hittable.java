@@ -1,41 +1,53 @@
 package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.solids.Solid;
+import com.epeters.raytrace.utils.Axis;
+import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.utils.Vector;
 
 /**
  * Generic interface for "something that can be hit by a {@link Ray}". This might be a
- * {@link Solid} or a more abstract bounding volume.
+ * solid object or a more abstract bounding volume.
  */
-public abstract class Hittable {
+public interface Hittable {
 
-    private final BoundingBox bounds;
+    Box getBounds();
 
-    protected Hittable(BoundingBox bounds) {
-        this.bounds = bounds;
+    Hit intersect(Ray ray, double tmin, double tmax);
+
+    default Hittable translate(Vector offset) {
+        Box bounds = getBounds().translate(offset);
+        return new HittableTransform(bounds, this) {
+            @Override
+            public Box getBounds() {
+                return bounds;
+            }
+            @Override
+            protected Vector transformPoint(Vector point) {
+                return point.minus(offset);
+            }
+        };
     }
 
-    /** @return the bounding box for this hittable (this will be called a lot) */
-    public final BoundingBox getBounds() {
-        return bounds;
-    }
-
-    /** @retyrn a new {@link Hit} if this ray hit something; null otherwise */
-    public final Hit hit(Ray ray, double tmin, double tmax) {
-        if (bounds != null && !bounds.intersects(ray, tmin, tmax)) {
-            return null;
-        }
-        return computeHit(ray, tmin, tmax);
-    }
-
-    protected abstract Hit computeHit(Ray ray, double tmin, double tmax);
-
-    public static Hittable translate(Hittable target, Vector offset) {
-        return new TranslatedHittable(target, offset);
-    }
-
-    public static Hittable rotateY(Hittable target, double angle) {
-        return new RotatedHittable(target, RotatedHittable.Axis.Y, angle);
+    default Hittable rotate(Axis axis, double degrees) {
+        Box bounds = getBounds().rotate(axis, degrees);
+        double cos = Math.cos(Math.toRadians(degrees));
+        double sin = Math.sin(Math.toRadians(degrees));
+        return new HittableTransform(bounds, this) {
+            @Override
+            public Box getBounds() {
+                return bounds;
+            }
+            @Override
+            protected Ray transformRay(Ray originalRay) {
+                Vector to = transformPoint(originalRay.origin());
+                Vector td = transformPoint(originalRay.direction());
+                return new Ray(to, td);
+            }
+            @Override
+            protected Vector transformPoint(Vector point) {
+                return point.rotateY(sin, cos);
+            }
+        };
     }
 }

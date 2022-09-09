@@ -20,7 +20,6 @@ public final class Camera {
     public final Vector vertical;
     private final Vector u;
     private final Vector v;
-    private final Vector w;
 
     public Camera(SceneConfig config) {
 
@@ -28,7 +27,7 @@ public final class Camera {
         double viewportWidth = config.aspectRatio * viewportHeight;
         double focalDistance = config.position.minus(config.target).length();
 
-        this.w = config.position.minus(config.target).normalize();
+        Vector w = config.position.minus(config.target).normalize();
         this.u = config.up.cross(w).normalize();
         this.v = w.cross(u);
         this.origin = config.position;

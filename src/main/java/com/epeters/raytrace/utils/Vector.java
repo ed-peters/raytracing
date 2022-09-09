@@ -1,5 +1,6 @@
 package com.epeters.raytrace.utils;
 
+import static com.epeters.raytrace.utils.Utils.random;
 import static com.epeters.raytrace.utils.Utils.randomUnitVector;
 import static com.epeters.raytrace.utils.Utils.scaleInt;
 import static com.epeters.raytrace.utils.Utils.sqrt;
@@ -17,12 +18,11 @@ public record Vector(double x, double y, double z) {
     public static final Vector MIN = new Vector(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
     public static final Vector MAX = new Vector(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
-    public double component(int which) {
+    public double component(Axis which) {
         return switch (which) {
-            case 0 -> x();
-            case 1 -> y();
-            case 2 -> z();
-            default -> throw new IllegalArgumentException("unknown component "+which);
+            case X -> x();
+            case Y -> y();
+            case Z -> z();
         };
     }
 
@@ -116,6 +116,32 @@ public record Vector(double x, double y, double z) {
             m.plusTimes(randomUnitVector(), fuzz);
         }
         return m.toVector();
+    }
+
+    /**
+     * Uses Snell's law for refraction, with Schlick's approximation for reflectance.
+     * @return the result of refracting this ray through a surface with the given index of refraction.
+     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#dielectrics/snell'slaw">guide</a>
+     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#dielectrics/schlickapproximation">guide</a>
+     */
+    public Vector refract(Vector normal, double ratio) {
+
+        double cos = Math.min(negate().dot(normal), 1.0);
+        double sin = sqrt(1.0 - cos * cos);
+        if (ratio * sin > 1.0) {
+            return reflect(normal, 0.0);
+        }
+
+        double reflectance = (1.0 - ratio) / (1.0 + ratio);
+        reflectance *= reflectance;
+        reflectance += (1.0 - reflectance) * Math.pow(1.0 - cos, 5.0);
+        if (reflectance > random(0.0, 1.0)) {
+            return reflect(normal, 0.0);
+        }
+
+        Mector result = new Mector(normal).mul(cos).plus(this).mul(ratio);
+        double factor = -sqrt(abs(1.0 - result.square()));
+        return result.plusTimes(normal, factor).toVector();
     }
 
     public Vector rotateY(double sin, double cos) {

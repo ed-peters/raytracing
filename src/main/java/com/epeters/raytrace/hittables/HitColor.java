@@ -21,10 +21,6 @@ public record HitColor(Vector emission, Vector attenuation, Vector bounce) {
         return c.toVector();
     }
 
-    public static HitColor solid(Vector color) {
-        return new HitColor(null, color, null);
-    }
-
     public static HitColor bounced(Vector color, Vector bounce) {
         return new HitColor(null, color, bounce);
     }

@@ -1,12 +1,11 @@
-package com.epeters.raytrace.solids;
+package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.hittables.HitColor;
-import com.epeters.raytrace.materials.MaterialParams;
+import com.epeters.raytrace.surfaces.MaterialParams;
 import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
-import com.epeters.raytrace.hittables.BoundingBox;
-import com.epeters.raytrace.materials.Material;
+import com.epeters.raytrace.utils.Box;
+import com.epeters.raytrace.surfaces.Material;
 
 import static com.epeters.raytrace.utils.Utils.dot;
 import static com.epeters.raytrace.utils.Utils.sqrt;
@@ -17,21 +16,34 @@ import static java.lang.Math.acos;
 import static java.lang.Math.atan2;
 
 /**
- * Concrete implementation of {@link Solid} for a simple sphere.
+ * Concrete implementation of {@link Hittable} for a simple sphere.
  */
-public final class Sphere extends Solid {
+public final class Sphere implements Hittable {
 
+    private final Box bounds;
+    private final Material material;
     private final Vector center;
     private final double radius;
 
     public Sphere(Material material, Vector center, double radius) {
-        super(computeBounds(center, radius), material);
+        Vector rvec = vec(abs(radius), abs(radius), abs(radius));
+        this.bounds = new Box(center.minus(rvec), center.plus(rvec));
+        this.material = material;
         this.center = center;
         this.radius = radius;
     }
 
     @Override
-    protected double computeHitDistance(Ray ray, double tmin, double tmax) {
+    public Box getBounds() {
+        return bounds;
+    }
+
+    @Override
+    public Hit intersect(Ray ray, double tmin, double tmax) {
+
+        if (bounds.doesNotIntersect(ray, tmin, tmax)) {
+            return null;
+        }
 
         Vector ro = ray.origin();
         Vector rd = ray.direction();
@@ -45,7 +57,7 @@ public final class Sphere extends Solid {
         double c = dot(ocx, ocy, ocz) - radius * radius;
         double d = hb * hb - a * c;
         if (d < 0.0) {
-            return Double.NaN;
+            return null;
         }
 
         double sd = sqrt(d);
@@ -53,31 +65,19 @@ public final class Sphere extends Solid {
         if (t < tmin || t > tmax) {
             t = (-hb + sd) / a;
             if (t < tmin || t > tmax) {
-                return Double.NaN;
+                return null;
             }
         }
 
-        return t;
+        return new Hit(ray, t, this::computeHitColor);
     }
 
-    @Override
-    protected HitColor computeHitColor(Vector point, Vector incoming) {
+    private HitColor computeHitColor(Vector point, Vector incoming) {
         Vector normal = new Mector().plus(point).minus(center).div(radius).normalize().toVector();
         double theta = acos(-normal.y());
         double phi = atan2(-normal.z(), normal.x()) + PI;
         double u = phi / (2 * PI);
         double v = theta / PI;
-        return getMaterial().computeHitColor(MaterialParams.from(point, incoming, normal, u, v));
-    }
-
-    public String toString() {
-        return String.format("Sphere[material=%s, center=%s, radius=%.2f]",
-                getMaterial().getClass().getSimpleName(),
-                center, radius);
-    }
-
-    private static BoundingBox computeBounds(Vector center, double radius) {
-        Vector rvec = vec(abs(radius), abs(radius), abs(radius));
-        return new BoundingBox(center.minus(rvec), center.plus(rvec));
+        return material.computeHitColor(MaterialParams.from(point, incoming, normal, u, v));
     }
 }

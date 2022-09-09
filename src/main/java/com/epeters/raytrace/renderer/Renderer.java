@@ -69,7 +69,7 @@ public final class Renderer {
         progress.reportProgress();
 
         List<Integer> list = new ArrayList<>(rows.keySet());
-        Collections.sort(list, Comparator.reverseOrder());
+        list.sort(Comparator.reverseOrder());
         return list.stream().map(rows::get).collect(Collectors.toList());
     }
 

@@ -1,4 +1,4 @@
-package com.epeters.raytrace.materials;
+package com.epeters.raytrace.surfaces;
 
 import com.epeters.raytrace.utils.Vector;
 
@@ -13,10 +13,6 @@ import com.epeters.raytrace.utils.Vector;
  * @param v v-coordinate for texture mapping
  */
 public record MaterialParams(Vector point, Vector incoming, Vector normal, boolean front, double u, double v) {
-
-    public static boolean isBackFace(Vector incoming, Vector normal) {
-        return incoming.dot(normal) > 0.0;
-    }
 
     public static MaterialParams from(Vector point, Vector incoming, Vector normal, double u, double v) {
         boolean f = true;

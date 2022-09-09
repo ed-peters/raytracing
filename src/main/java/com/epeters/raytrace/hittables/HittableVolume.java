@@ -1,14 +1,12 @@
 package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.utils.Axis;
+import com.epeters.raytrace.utils.Box;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.epeters.raytrace.utils.Utils.randomComponent;
 
 /**
  * Implementation of {@link Hittable} that represents an abstract volume in space. Implements a
@@ -16,41 +14,50 @@ import static com.epeters.raytrace.utils.Utils.randomComponent;
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/thebvhnodeclass">guide</a>
  */
-public  final class BoundingVolume extends Hittable {
+public  final class HittableVolume implements Hittable {
 
+    private final Box bounds;
     private final Hittable left;
     private final Hittable right;
 
-    public BoundingVolume(Hittable left) {
-        super(left.getBounds());
+    public HittableVolume(Hittable left) {
         this.left = left;
         this.right = null;
+        this.bounds = left.getBounds();
     }
 
-    public BoundingVolume(Hittable left, Hittable right) {
-        super(BoundingBox.from(Arrays.asList(left, right)));
+    public HittableVolume(Hittable left, Hittable right) {
         this.left = left;
         this.right = right;
+        this.bounds = Box.merge(left.getBounds(), right.getBounds());
     }
 
     @Override
-    protected Hit computeHit(Ray ray, double tmin, double tmax) {
-        Hit leftHit = left.hit(ray, tmin, tmax);
+    public Box getBounds() {
+        return bounds;
+    }
+
+    @Override
+    public Hit intersect(Ray ray, double tmin, double tmax) {
+        if (bounds.doesNotIntersect(ray, tmin, tmax)) {
+            return null;
+        }
+        Hit leftHit = left.intersect(ray, tmin, tmax);
         if (right == null) {
             return leftHit;
         }
-        Hit rightHit = right.hit(ray, tmin, leftHit == null ? tmax : leftHit.t());
+        Hit rightHit = right.intersect(ray, tmin, leftHit == null ? tmax : leftHit.t());
         return (rightHit == null) ? leftHit : rightHit;
     }
 
-    public static BoundingVolume from(Hittable hittable) {
-        if (hittable instanceof BoundingVolume) {
-            return (BoundingVolume) hittable;
+    public static HittableVolume from(Hittable hittable) {
+        if (hittable instanceof HittableVolume) {
+            return (HittableVolume) hittable;
         }
-        return new BoundingVolume(hittable);
+        return new HittableVolume(hittable);
     }
 
-    public static BoundingVolume from(List<? extends Hittable> hittables) {
+    public static HittableVolume from(List<? extends Hittable> hittables) {
 
         if (hittables.size() == 0) {
             throw new IllegalArgumentException("empty list is not allowed");
@@ -59,16 +66,16 @@ public  final class BoundingVolume extends Hittable {
             return from(hittables.get(0));
         }
 
-        final int c = randomComponent();
-        Collections.sort(hittables, Comparator.comparingDouble(h -> h.getBounds().getMin().component(c)));
+        Axis axis = Axis.randomAxis();
+        hittables.sort(Comparator.comparingDouble(h -> h.getBounds().min().component(axis)));
 
         if (hittables.size() == 2) {
-            return new BoundingVolume(hittables.get(0), hittables.get(1));
+            return new HittableVolume(hittables.get(0), hittables.get(1));
         }
 
         int split = hittables.size() / 2;
         List<? extends Hittable> left = new ArrayList<>(hittables.subList(0, split));
         List<? extends Hittable> right = new ArrayList<>(hittables.subList(split, hittables.size()));
-        return new BoundingVolume(from(left), from(right));
+        return new HittableVolume(from(left), from(right));
     }
 }

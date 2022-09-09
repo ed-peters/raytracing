@@ -36,10 +36,6 @@ public final class Utils {
         return ThreadLocalRandom.current().nextInt(max);
     }
 
-    public static int randomComponent() {
-        return randomInt(3);
-    }
-
     public static Vector randomVectorInUnitCube() {
         return randomVector(-1.0, 1.0);
     }
@@ -83,10 +79,6 @@ public final class Utils {
 
     public static double sqrt(double val) {
         return java.lang.Math.sqrt(val);
-    }
-
-    public static double square(double val) {
-        return val * val;
     }
 
     public static void time(Runnable runnable) {
