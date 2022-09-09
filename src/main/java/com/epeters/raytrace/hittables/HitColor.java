@@ -2,8 +2,6 @@ package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.utils.Vector;
 
-import java.util.function.Function;
-
 /**
  * Represents the details of coloring a particular point
  */
