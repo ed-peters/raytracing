@@ -7,11 +7,11 @@ public class Main {
 
     public static void main(String [] args) {
 
-        SceneConfig config = Scenes.cornellBoxWithObjects(false);
-        config.imageWidth = 500;
-        config.aspectRatio = 1.0;
-        config.samplesPerPixel = 200;
-        config.bouncesPerPixel = 50;
+        SceneConfig config = Scenes.defaultThreeBalls(); // cornellBoxWithObjects(false);
+        config.imageWidth = 600;
+//        config.aspectRatio = 1.0;
+        config.samplesPerPixel = 10;
+        config.bouncesPerPixel = 10;
 
         int threads = Runtime.getRuntime().availableProcessors() - 1;
         String path = System.getProperty("user.home") + "/Desktop/trace.png";

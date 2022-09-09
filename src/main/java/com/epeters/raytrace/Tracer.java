@@ -4,7 +4,6 @@ import com.epeters.raytrace.hittables.HittableVolume;
 import com.epeters.raytrace.hittables.Hit;
 import com.epeters.raytrace.hittables.HitColor;
 import com.epeters.raytrace.hittables.Hittable;
-import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 
 import java.util.function.Function;
@@ -12,6 +11,7 @@ import java.util.function.Function;
 import static com.epeters.raytrace.utils.Utils.BLACK;
 import static com.epeters.raytrace.utils.Utils.random;
 import static com.epeters.raytrace.utils.Utils.sqrt;
+import static com.epeters.raytrace.utils.Vector.ORIGIN;
 import static com.epeters.raytrace.utils.Vector.vec;
 
 public final class Tracer {
@@ -99,18 +99,18 @@ public final class Tracer {
         Vector a = color.attenuation();
         Vector b = color.bounce();
 
-        Mector result = new Mector();
+        Vector c = ORIGIN;
         if (e != null) {
-            result.plus(e);
+            c = c.plus(e);
         }
         if (a != null) {
             if (b == null) {
-                result.plus(a);
+                c = c.plus(a);
             } else {
-                Ray bounce = new Ray(point, color.bounce());
-                result.plusTimes(a, computeColor(bounce, bouncesRemaining - 1));
+                Ray r = new Ray(point, color.bounce());
+                c = c.plus(a.mul(computeColor(r, bouncesRemaining - 1)));
             }
         }
-        return result.toVector();
+        return c;
     }
 }

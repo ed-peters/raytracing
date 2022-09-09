@@ -2,7 +2,6 @@ package com.epeters.raytrace.hittables;
 
 import com.epeters.raytrace.Ray;
 import com.epeters.raytrace.surfaces.MaterialParams;
-import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.surfaces.Material;
@@ -73,7 +72,7 @@ public final class Sphere implements Hittable {
     }
 
     private HitColor computeHitColor(Vector point, Vector incoming) {
-        Vector normal = new Mector().plus(point).minus(center).div(radius).normalize().toVector();
+        Vector normal = point.minus(center).mul(1.0 / radius).normalize();
         double theta = acos(-normal.y());
         double phi = atan2(-normal.z(), normal.x()) + PI;
         double u = phi / (2 * PI);

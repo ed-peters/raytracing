@@ -1,6 +1,5 @@
 package com.epeters.raytrace;
 
-import com.epeters.raytrace.utils.Mector;
 import com.epeters.raytrace.utils.Vector;
 
 import static java.lang.Math.tan;
@@ -41,20 +40,18 @@ public final class Camera {
     }
 
     public Ray computeRay(double s, double t) {
-        Mector o = new Mector(origin);
-        Mector d = new Mector(lowerLeft)
-                .plusTimes(horizontal, s)
-                .plusTimes(vertical, t)
-                .minus(origin);
+
+        Vector o = origin;
         if (lensRadius > 0.0) {
             Vector rando = randomVectorInUnitDisc().mul(lensRadius);
-            Vector f = new Mector()
-                    .plusTimes(u, rando.x())
-                    .plusTimes(v, rando.y())
-                    .toVector();
-            o.plus(f);
-            d.minus(f);
+            Vector offset = u.mul(rando.x()).plus(v.mul(rando.y()));
+            o = o.plus(offset);
         }
-        return new Ray(o.toVector(), d.toVector());
+
+        Vector d = lowerLeft
+                .plus(horizontal.mul(s))
+                .plus(vertical.mul(t))
+                .minus(o);
+        return new Ray(o, d);
     }
 }

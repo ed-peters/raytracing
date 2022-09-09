@@ -111,11 +111,11 @@ public record Vector(double x, double y, double z) {
      */
     public Vector reflect(Vector normal, double fuzz) {
         double d = 2.0 * dot(normal);
-        Mector m = new Mector(this).plusTimes(normal, -d);
+        Vector v = plus(normal.mul(-d));
         if (fuzz > 0.0) {
-            m.plusTimes(randomUnitVector(), fuzz);
+            v = v.plus(randomUnitVector().mul(fuzz));
         }
-        return m.toVector();
+        return v;
     }
 
     /**
@@ -139,9 +139,9 @@ public record Vector(double x, double y, double z) {
             return reflect(normal, 0.0);
         }
 
-        Mector result = new Mector(normal).mul(cos).plus(this).mul(ratio);
+        Vector result = normal.mul(cos).plus(this).mul(ratio);
         double factor = -sqrt(abs(1.0 - result.square()));
-        return result.plusTimes(normal, factor).toVector();
+        return result.plus(normal.mul(factor));
     }
 
     public Vector rotateY(double sin, double cos) {
