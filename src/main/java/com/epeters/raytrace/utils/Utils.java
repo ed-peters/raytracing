@@ -4,21 +4,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.epeters.raytrace.utils.Vector.vec;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 /**
  * Helpers for common simple stuff
  */
 public final class Utils {
-
-    public static final Vector RED = vec(1.0, 0.0, 0.0);
-    public static final Vector BLACK = Vector.ORIGIN;
-    public static final Vector WHITE = vec(1.0, 1.0, 1.0);
-    public static final Vector GREEN = vec(0.0, 1.0, 0.0);
-    public static final Vector BLUE = vec(0.0, 0.0, 1.0);
-    public static final Vector SKY_BLUE = vec(0.5, 0.7, 1.0);
-    public static final Vector MID_GRAY = vec(0.5, 0.5, 0.5);
-    public static final Vector DARK_PINK = vec(0.8, 0.0, 0.4);
-    public static final Vector DARK_GREEN = vec(0.0, 0.4, 0.0);
 
     public static double random() {
         return ThreadLocalRandom.current().nextDouble();
@@ -47,6 +39,16 @@ public final class Utils {
                 return next.normalize();
             }
         }
+    }
+
+    public static Vector randomCosineDirection() {
+        double r1 = random();
+        double r2 = random();
+        double z = sqrt(1.0 - r2);
+        double phi = 2.0 * Math.PI * r1;
+        double x = cos(phi) * sqrt(r2);
+        double y = sin(phi) * sqrt(r2);
+        return vec(x, y, z);
     }
 
     public static Vector randomVectorInUnitDisc() {
@@ -99,5 +101,15 @@ public final class Utils {
         catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T coalesce(T... options) {
+        for (T opt : options) {
+            if (opt != null) {
+                return opt;
+            }
+        }
+        return null;
     }
 }

@@ -1,7 +1,8 @@
-package com.epeters.raytrace.hittables;
+package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.Ray;
-import com.epeters.raytrace.surfaces.MaterialParams;
+import com.epeters.raytrace.hittables.Hit;
+import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.utils.Vector;
 import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.surfaces.Material;
@@ -68,15 +69,12 @@ public final class Sphere implements Hittable {
             }
         }
 
-        return new Hit(ray, t, this::computeHitColor);
-    }
-
-    private HitColor computeHitColor(Vector point, Vector incoming) {
+        Vector point = ray.at(t);
         Vector normal = point.minus(center).mul(1.0 / radius).normalize();
         double theta = acos(-normal.y());
         double phi = atan2(-normal.z(), normal.x()) + PI;
         double u = phi / (2 * PI);
         double v = theta / PI;
-        return material.computeHitColor(MaterialParams.from(point, incoming, normal, u, v));
+        return Hit.from(ray, t, point, normal, material, u, v);
     }
 }

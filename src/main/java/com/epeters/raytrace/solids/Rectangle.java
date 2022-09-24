@@ -1,18 +1,21 @@
-package com.epeters.raytrace.hittables;
+package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.hittables.Hit;
+import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.surfaces.Material;
-import com.epeters.raytrace.surfaces.MaterialParams;
 import com.epeters.raytrace.utils.XYZPlane;
 import com.epeters.raytrace.utils.Vector;
 
 import static com.epeters.raytrace.utils.Vector.vec;
+import static com.epeters.raytrace.utils.Utils.random;
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 /**
- * Implementation of a rectangular "slab" on the XY plane with a minimal thickness.
+ * Implementation of a rectangular "slab" on a plane with a minimal thickness.
  *
  * @see <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html#rectanglesandlights/creatingrectangleobjects">guide</a>
  */
@@ -76,22 +79,30 @@ public final class Rectangle implements Hittable {
             return null;
         }
 
-        return new Hit(ray, t, this::computeHitColor);
-    }
-
-    protected HitColor computeHitColor(Vector point, Vector incoming) {
+        Vector point = ray.at(t);
         double u = (point.component(type.i) - i0) / (i1 - i0);
         double v = (point.component(type.j) - j0) / (j1 - j0);
-        return material.computeHitColor(MaterialParams.from(point, incoming, type.normal, u, v));
+
+        return Hit.from(ray, t, point, type.normal, material, u, v);
     }
 
-    private static Box makeBounds(XYZPlane type, double i0, double i1, double j0, double j1, double k) {
-        double k0 = k - 0.0001;
-        double k1 = k + 0.0001;
-        return switch (type) {
-            case XY -> new Box(vec(i0, j0, k0), vec(i1, j1, k1));
-            case YZ -> new Box(vec(k0, i0, j0), vec(k1, i1, j1));
-            case XZ -> new Box(vec(i0, k0, j0), vec(i1, k1, j1));
-        };
+    @Override
+    public double pdfValue(Vector origin, Vector direction) {
+
+        Hit hit = intersect(new Ray(origin, direction), 0.001, Double.MAX_VALUE);
+        if (hit == null) {
+            return 0.0;
+        }
+
+        double area = (i1 - i0) * (j1 - j0);
+        double dsq = hit.t() * hit.t() * direction.square();
+        double cos = abs(direction.dot(hit.normal()) / direction.length());
+        return dsq / (cos * area);
+    }
+
+    @Override
+    public Vector directionTowards(Vector origin) {
+        Vector randomPoint = type.fromIjk(random(i0, i1), random(j0, j1), k);
+        return randomPoint.minus(origin).normalize();
     }
 }

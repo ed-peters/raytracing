@@ -22,4 +22,12 @@ public enum XYZPlane {
         this.k = k;
         this.normal = normal;
     }
+
+    public Vector fromIjk(double i, double j, double k) {
+        return switch (this) {
+            case XY -> vec(i, j, k);
+            case YZ -> vec(k, i, j);
+            case XZ -> vec(i, k, j);
+        };
+    }
 }

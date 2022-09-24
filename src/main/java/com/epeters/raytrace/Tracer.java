@@ -2,17 +2,17 @@ package com.epeters.raytrace;
 
 import com.epeters.raytrace.hittables.HittableVolume;
 import com.epeters.raytrace.hittables.Hit;
-import com.epeters.raytrace.hittables.HitColor;
+import com.epeters.raytrace.hittables.Scatter;
 import com.epeters.raytrace.hittables.Hittable;
-import com.epeters.raytrace.utils.Vector;
+import com.epeters.raytrace.surfaces.Material;
+import com.epeters.raytrace.utils.Color;
+import com.epeters.raytrace.utils.Pdf;
 
 import java.util.function.Function;
 
-import static com.epeters.raytrace.utils.Utils.BLACK;
+import static com.epeters.raytrace.utils.Color.BLACK;
+import static com.epeters.raytrace.utils.Utils.coalesce;
 import static com.epeters.raytrace.utils.Utils.random;
-import static com.epeters.raytrace.utils.Utils.sqrt;
-import static com.epeters.raytrace.utils.Vector.ORIGIN;
-import static com.epeters.raytrace.utils.Vector.vec;
 
 public final class Tracer {
 
@@ -23,7 +23,8 @@ public final class Tracer {
     private final Hittable world;
     private final int imageWidth;
     private final int imageHeight;
-    private final Function<Ray,Vector> backgroundColor;
+    private final Function<Ray,Color> backgroundColor;
+    private final Hittable light;
 
     public Tracer(SceneConfig config) {
         this.samplesPerPixel = config.samplesPerPixel;
@@ -34,6 +35,7 @@ public final class Tracer {
         this.imageWidth = config.imageWidth;
         this.imageHeight = (int)(imageWidth / config.aspectRatio);
         this.backgroundColor = config.backgroundColor;
+        this.light = config.light;
     }
 
     public int getImageWidth() {
@@ -45,11 +47,9 @@ public final class Tracer {
     }
 
     /** Renders a single pixel of the output image */
-    public Vector renderPixel(int x, int y) {
+    public Color renderPixel(int x, int y) {
 
-        double pixelX = 0.0;
-        double pixelY = 0.0;
-        double pixelZ = 0.0;
+        Color color = Color.BLACK;
 
         for (int s=0; s<samplesPerPixel; s++) {
 
@@ -57,20 +57,14 @@ public final class Tracer {
             double v = (y + random(-0.5, 0.5)) / (double) (imageHeight - 1);
             Ray ray = camera.computeRay(u, v);
 
-            Vector color = computeColor(ray, bouncesPerPixel);
-            pixelX += color.x();
-            pixelY += color.y();
-            pixelZ += color.z();
+            color = color.plus(computeColor(ray, bouncesPerPixel));
         }
 
-        pixelX = sqrt(pixelX * sampleScale);
-        pixelY = sqrt(pixelY * sampleScale);
-        pixelZ = sqrt(pixelZ * sampleScale);
-        return vec(pixelX, pixelY, pixelZ);
+        return color.normalize(samplesPerPixel);
     }
 
     /** Determines the color of the scene at the point hit by the specified ray */
-    private Vector computeColor(Ray ray, int bouncesRemaining) {
+    private Color computeColor(Ray ray, int bouncesRemaining) {
 
         // if we're out of bounces, this ray won't contribute any color
         if (bouncesRemaining < 1) {
@@ -83,34 +77,30 @@ public final class Tracer {
             return backgroundColor.apply(ray);
         }
 
-        // if we do have a hit, let's find out more
-        Vector point = hit.ray().at(hit.t());
-        Vector incoming = hit.ray().direction();
-        HitColor color = hit.color().apply(point, incoming);
-        if (color == null) {
-            throw new IllegalStateException("no color available from object");
-        }
-        return combineColor(point, color, bouncesRemaining);
-    }
+        Material material = hit.material();
+        Scatter scatter = material.computeScatter(ray, hit);
 
-    private Vector combineColor(Vector point, HitColor color, int bouncesRemaining) {
+        switch (scatter.type()) {
 
-        Vector e = color.emission();
-        Vector a = color.attenuation();
-        Vector b = color.bounce();
+            case EMISSIVE:
+                return scatter.emission();
 
-        Vector c = ORIGIN;
-        if (e != null) {
-            c = c.plus(e);
-        }
-        if (a != null) {
-            if (b == null) {
-                c = c.plus(a);
-            } else {
-                Ray r = new Ray(point, color.bounce());
-                c = c.plus(a.mul(computeColor(r, bouncesRemaining - 1)));
+            case DIFFUSE: {
+                Pdf pdf0 = Pdf.hittable(light, hit.point());
+                Pdf pdf1 = Pdf.cosine(hit.normal());
+                Pdf pdf = Pdf.mix(pdf0, pdf1);
+
+                Ray bounceRay = new Ray(hit.point(), pdf.generate());
+                Color bounceColor = computeColor(bounceRay, bouncesRemaining - 1);
+                double pmf = material.computeScatterPdf(ray, hit, bounceRay);
+                return scatter.emission().plus(scatter.attenuation().mul(pmf).mul(bounceColor).div(pdf.value(bounceRay.direction())));
             }
+
+            case SPECULAR:
+                throw new UnsupportedOperationException();
+
         }
-        return c;
+
+        throw new UnsupportedOperationException();
     }
 }

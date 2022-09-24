@@ -1,14 +1,14 @@
 package com.epeters.raytrace.surfaces;
 
+import com.epeters.raytrace.hittables.Hit;
+import com.epeters.raytrace.utils.Color;
 import com.epeters.raytrace.utils.Perlin;
-import com.epeters.raytrace.utils.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import static com.epeters.raytrace.utils.Utils.clamp;
-import static com.epeters.raytrace.utils.Vector.vec;
 import static java.lang.Math.sin;
 
 /**
@@ -20,23 +20,23 @@ public interface Texture {
     /**
      * The main method for all textures to implement
      */
-    Vector calculateColor(Vector point, double u, double v);
+    Color calculateColor(Hit hit);
 
     /**
      * Uniform color at any point
      */
-    static Texture solid(Vector color) {
-        return (p, u, v) -> color;
+    static Texture solid(Color color) {
+        return (hit) -> color;
     }
 
     /**
      * Alternating squares of color
      */
-    static Texture checker(Vector even, Vector odd) {
-        return (p, u, v) -> {
-            double sx = sin(10.0 * p.x());
-            double sy = sin(10.0 * p.y());
-            double sz = sin(10.0 * p.z());
+    static Texture checker(Color even, Color odd) {
+        return (hit) -> {
+            double sx = sin(10.0 * hit.point().x());
+            double sy = sin(10.0 * hit.point().y());
+            double sz = sin(10.0 * hit.point().z());
             double sines = sx * sy * sz;
             return (sines < 0) ? odd : even;
         };
@@ -45,10 +45,10 @@ public interface Texture {
     /**
      * Perlin noise
      */
-    static Texture noise(Vector color, double scale) {
+    static Texture noise(Color color, double scale) {
         Perlin perlin = new Perlin();
-        return (p, u, v) -> {
-            double n = 0.5 * (1.0 - perlin.noise(p.mul(scale)));
+        return (hit) -> {
+            double n = 0.5 * (1.0 - perlin.noise(hit.point().mul(scale)));
             return color.mul(n);
         };
     }
@@ -56,10 +56,10 @@ public interface Texture {
     /**
      * Marble-like texture
      */
-    static Texture turbulence(Vector color, double scale, int depth) {
+    static Texture turbulence(Color color, double scale, int depth) {
         Perlin perlin = new Perlin();
-        return (p, u, v) -> {
-            double n = 0.5 * sin(scale * p.z() + 10.0 * perlin.turbulence(p, depth));
+        return (hit) -> {
+            double n = 0.5 * sin(scale * hit.point().z() + 10.0 * perlin.turbulence(hit.point(), depth));
             return color.mul(n);
         };
     }
@@ -72,14 +72,14 @@ public interface Texture {
             final BufferedImage image = ImageIO.read(Texture.class.getResourceAsStream(path));
             final int width = image.getWidth();
             final int height = image.getHeight();
-            return (p, u, v) -> {
+            return (hit) -> {
 
-                int i = (int) (clamp(u, 0.0, 1.0) * width);
+                int i = (int) (clamp(hit.u(), 0.0, 1.0) * width);
                 if (i > width) {
                     i = width - 1;
                 }
 
-                int j = (int) (clamp((1.0 - v), 0.0, 1.0) * height);
+                int j = (int) (clamp((1.0 - hit.v()), 0.0, 1.0) * height);
                 if (j > height) {
                     j = height - 1;
                 }
@@ -89,7 +89,7 @@ public interface Texture {
                 double r = ((rgb >> 16) & 0xFF) * s;
                 double g = ((rgb >> 8) & 0xFF) * s;
                 double b = (rgb & 0xFF) * s;
-                return vec(r, g, b);
+                return Color.color(r, g, b);
             };
         } catch (IOException e) {
             throw new RuntimeException(e);

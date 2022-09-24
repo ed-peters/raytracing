@@ -1,8 +1,9 @@
-package com.epeters.raytrace.hittables;
+package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.hittables.Hit;
+import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.surfaces.Material;
-import com.epeters.raytrace.surfaces.MaterialParams;
 import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.utils.Vector;
 
@@ -62,11 +63,6 @@ public class Triangle implements Hittable {
             return null;
         }
 
-        return new Hit(ray, t, (p, i) -> computeColor(p, i, u, v));
-    }
-
-    private HitColor computeColor(Vector point, Vector incoming, double u, double v) {
-        MaterialParams params = MaterialParams.from(point, incoming, norm, u, v);
-        return material.computeHitColor(params);
+        return Hit.from(ray, t, norm, material, u, v);
     }
 }

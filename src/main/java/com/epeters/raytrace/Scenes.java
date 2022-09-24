@@ -3,38 +3,42 @@ package com.epeters.raytrace;
 import com.epeters.raytrace.hittables.HittableVolume;
 import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.surfaces.Material;
-import com.epeters.raytrace.hittables.Solids;
+import com.epeters.raytrace.solids.Solids;
 import com.epeters.raytrace.surfaces.Texture;
 import com.epeters.raytrace.utils.Axis;
+import com.epeters.raytrace.utils.Color;
 import com.epeters.raytrace.utils.Mesh;
 import com.epeters.raytrace.utils.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epeters.raytrace.hittables.Solids.tmesh;
+import static com.epeters.raytrace.solids.Solids.tmesh;
 import static com.epeters.raytrace.surfaces.Material.light;
-import static com.epeters.raytrace.hittables.Solids.box;
-import static com.epeters.raytrace.hittables.Solids.lsphere;
-import static com.epeters.raytrace.hittables.Solids.rect;
-import static com.epeters.raytrace.hittables.Solids.sphere;
-import static com.epeters.raytrace.hittables.Solids.tsphere;
+import static com.epeters.raytrace.solids.Solids.box;
+import static com.epeters.raytrace.solids.Solids.lsphere;
+import static com.epeters.raytrace.solids.Solids.rect;
+import static com.epeters.raytrace.solids.Solids.sphere;
+import static com.epeters.raytrace.solids.Solids.tsphere;
 import static com.epeters.raytrace.surfaces.Material.norm;
 import static com.epeters.raytrace.surfaces.Texture.checker;
 import static com.epeters.raytrace.surfaces.Texture.image;
 import static com.epeters.raytrace.surfaces.Texture.noise;
 import static com.epeters.raytrace.surfaces.Texture.solid;
-import static com.epeters.raytrace.utils.Utils.BLACK;
-import static com.epeters.raytrace.utils.Utils.DARK_GREEN;
-import static com.epeters.raytrace.utils.Utils.MID_GRAY;
-import static com.epeters.raytrace.utils.Utils.WHITE;
+import static com.epeters.raytrace.utils.Color.DARK_GREEN;
+import static com.epeters.raytrace.utils.Color.WHITE;
+import static com.epeters.raytrace.utils.Color.BLACK;
+import static com.epeters.raytrace.utils.Color.RED;
+import static com.epeters.raytrace.utils.Color.GREEN;
+import static com.epeters.raytrace.utils.Color.BLUE;
+import static com.epeters.raytrace.utils.Color.WHITE;
+import static com.epeters.raytrace.utils.Color.MID_GRAY;
+import static com.epeters.raytrace.utils.Color.color;
 import static com.epeters.raytrace.utils.Utils.random;
 import static com.epeters.raytrace.utils.Utils.randomVector;
 import static com.epeters.raytrace.utils.Utils.randomVectorInUnitCube;
 import static com.epeters.raytrace.utils.Vector.ORIGIN;
 import static com.epeters.raytrace.utils.Vector.vec;
-import static com.epeters.raytrace.utils.Utils.RED;
-import static com.epeters.raytrace.utils.Utils.BLUE;
 import static com.epeters.raytrace.surfaces.Material.lambertian;
 import static com.epeters.raytrace.surfaces.Material.metal;
 import static com.epeters.raytrace.surfaces.Material.dialectric;
@@ -44,7 +48,7 @@ import static com.epeters.raytrace.utils.XYZPlane.YZ;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 
-import static com.epeters.raytrace.hittables.Solids.fog;
+import static com.epeters.raytrace.solids.Solids.fog;
 import static com.epeters.raytrace.utils.XYZPlane.XY;
 
 public class Scenes {
@@ -53,7 +57,7 @@ public class Scenes {
     public static final Material M_RED = lambertian(RED);
     public static final Material M_BLUE = lambertian(BLUE);
     public static final Material M_NOISE = lambertian(turbulence(WHITE, 4.0, 7));
-    public static final Material M_LIGHT = light(vec(4.0, 4.0, 4.0));
+    public static final Material M_LIGHT = light(color(4.0, 4.0, 4.0));
 
     // ====================================================================================
     // triangles!
@@ -108,7 +112,7 @@ public class Scenes {
         config.position = vec(26.0, 3.0, 6.0);
         config.target = vec(0.0, 2.0, 0.0);
         config.fieldOfView = 20.0;
-        config.backgroundColor = (r) -> ORIGIN;
+        config.backgroundColor = (r) -> BLACK;
         return config;
     }
 
@@ -131,10 +135,10 @@ public class Scenes {
 
     public static SceneConfig cornellBox() {
 
-        Material red = lambertian(solid(vec(0.65, 0.05, 0.05)));
-        Material white = lambertian(solid(vec(0.73, 0.73, 0.73)));
-        Material green = lambertian(solid(vec(0.12, 0.45, 0.15)));
-        Material light = light(vec(15.0, 15.0, 15.0));
+        Material red = lambertian(solid(color(0.65, 0.05, 0.05)));
+        Material white = lambertian(solid(color(0.73, 0.73, 0.73)));
+        Material green = lambertian(solid(color(0.12, 0.45, 0.15)));
+        Material light = light(color(15.0, 15.0, 15.0));
 
         SceneConfig config = new SceneConfig();
         config.add(rect(YZ, 0.0, 0.0, 555.0, 555.0, 555.0, green));
@@ -153,10 +157,10 @@ public class Scenes {
 
     public static SceneConfig cornellBoxWithObjects(boolean fog) {
 
-        Material red = lambertian(solid(vec(0.65, 0.05, 0.05)));
-        Material white = lambertian(solid(vec(0.73, 0.73, 0.73)));
-        Material green = lambertian(solid(vec(0.12, 0.45, 0.15)));
-        Material light = light(vec(15.0, 15.0, 15.0));
+        Material red = lambertian(solid(color(0.65, 0.05, 0.05)));
+        Material white = lambertian(solid(color(0.73, 0.73, 0.73)));
+        Material green = lambertian(solid(color(0.12, 0.45, 0.15)));
+        Material light = light(color(15.0, 15.0, 15.0));
 
         SceneConfig config = new SceneConfig();
 
@@ -181,7 +185,7 @@ public class Scenes {
         config.add(rect(XZ, 0.0, 0.0, 555.0, 555.0, 0.0, white));
         config.add(rect(XZ, 0.0, 0.0, 555.0, 555.0, 555.0, white));
         config.add(rect(XY, 0.0, 0, 555.0, 555.0, 555.0, white));
-        config.add(rect(XZ, 213.0, 227.0, 343.0, 332.0, 554.0, light));
+        config.add((config.light = rect(XZ, 213.0, 227.0, 343.0, 332.0, 554.0, light)).flip());
         config.aspectRatio = 1.0;
         config.position = vec(278.0, 278.0, -800.0);
         config.target = vec(278.0, 278.0, 0.0);
@@ -196,10 +200,10 @@ public class Scenes {
 
     public static SceneConfig defaultThreeBalls() {
 
-        Material ground = lambertian(vec(0.8, 0.8, 0.0));
+        Material ground = lambertian(color(0.8, 0.8, 0.0));
         Material left = dialectric(1.5);
-        Material center = lambertian(vec(0.1, 0.2, 0.5));
-        Material right = metal(vec(0.8, 0.6, 0.2), 0.0);
+        Material center = lambertian(color(0.1, 0.2, 0.5));
+        Material right = metal(color(0.8, 0.6, 0.2), 0.0);
 
         SceneConfig config = new SceneConfig();
         config.add(sphere(vec(0.0, -100.5, -1.0), 100.0, ground));
@@ -313,8 +317,9 @@ public class Scenes {
     // random world
     // ====================================================================================
 
-    public static Vector randomColor() {
-        return randomVectorInUnitCube().mul(randomVectorInUnitCube());
+    public static Color randomColor() {
+        Vector v = randomVectorInUnitCube().mul(randomVectorInUnitCube());
+        return color(v.x(), v.y(), v.z());
     }
 
     public static SceneConfig randomWorld() {
@@ -333,10 +338,10 @@ public class Scenes {
                 if (center.minus(comp).length() > 0.9) {
                     double material = random();
                     if (material < 0.8) {
-                        Vector color = randomColor();
+                        Color color = randomColor();
                         config.add(sphere(center, 0.2, lambertian(color)));
                     } else if (material < 0.95) {
-                        Vector color = randomColor();
+                        Color color = randomColor();
                         double fuzz = random(0.0, 0.5);
                         config.add(sphere(center, 0.2, metal(color, fuzz)));
                     } else {
@@ -347,8 +352,8 @@ public class Scenes {
         }
 
         config.add(sphere(vec(0.0, 1.0, 0.0), 1.0, dialectric(1.5f)));
-        config.add(sphere(vec(-4.0, 1.0, 0.0), 1.0, lambertian(vec(0.4, 0.2, 0.1))));
-        config.add(sphere(vec(4.0, 1.0, 0.0), 1.0, metal(vec(0.7, 0.6, 0.5), 0.0)));
+        config.add(sphere(vec(-4.0, 1.0, 0.0), 1.0, lambertian(color(0.4, 0.2, 0.1))));
+        config.add(sphere(vec(4.0, 1.0, 0.0), 1.0, metal(color(0.7, 0.6, 0.5), 0.0)));
         config.position = vec(13.0, 2.0, 3.0);
         config.target = ORIGIN;
         config.up = vec(0.0, 1.0, 0.0);
@@ -364,11 +369,11 @@ public class Scenes {
 
         SceneConfig config = new SceneConfig();
 
-        Material light = light(vec(7.0, 7.0, 7.0));
+        Material light = light(color(7.0, 7.0, 7.0));
         config.add(rect(XZ, 100, 220, 300, 420, 550, light));
 
         List<Hittable> boxes = new ArrayList<>();
-        Material ground = lambertian(vec(0.48, 0.83, 0.53));
+        Material ground = lambertian(color(0.48, 0.83, 0.53));
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
 
@@ -386,20 +391,20 @@ public class Scenes {
             }
         }
 
-        config.add(sphere(vec(400, 400, 200), 50, lambertian(vec(0.7, 0.3, 0.1))));
+        config.add(sphere(vec(400, 400, 200), 50, lambertian(color(0.7, 0.3, 0.1))));
         config.add(sphere(vec(260, 150, 45), 50, dialectric(1.5)));
-        config.add(sphere(vec(0, 150, 145), 50, metal(vec(0.8, 0.8, 0.9), 1.0)));
+        config.add(sphere(vec(0, 150, 145), 50, metal(color(0.8, 0.8, 0.9), 1.0)));
         config.add(sphere(vec(400, 200, 400), 100, lambertian(image("/earth.jpg"))));
         config.add(sphere(vec(220, 280, 300), 80, lambertian(noise(WHITE, 0.1))));
 
         Hittable b1 = sphere(vec(360, 150, 145), 70, dialectric(1.5));
         config.add(b1);
-        config.add(fog(b1, 0.2, vec(0.2, 0.4, 0.9)));
+        config.add(fog(b1, 0.2, color(0.2, 0.4, 0.9)));
 //
 //        Solid b2 = sphere(vec(0, 0, 0), 5000, dialectric(1.5));
 //        config.add(fog(b2, 0.0001, WHITE));
 
-        Material offwhite = lambertian(vec(0.73, 0.73, 0.73));
+        Material offwhite = lambertian(color(0.73, 0.73, 0.73));
         List<Hittable> boxes2 = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             boxes2.add(sphere(randomVector(0, 165), 10, offwhite));

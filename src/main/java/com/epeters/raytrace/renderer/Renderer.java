@@ -1,7 +1,7 @@
 package com.epeters.raytrace.renderer;
 
 import com.epeters.raytrace.Tracer;
-import com.epeters.raytrace.utils.Vector;
+import com.epeters.raytrace.utils.Color;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -32,22 +32,22 @@ public final class Renderer {
     }
 
     public void render() {
-        List<Vector[]> rows = threads > 1 ? renderThreaded() : renderImmediate();
+        List<Color[]> rows = threads > 1 ? renderThreaded() : renderImmediate();
         writeData(rows);
     }
 
-    public List<Vector[]> renderImmediate() {
-        List<Vector[]> rows = new ArrayList<>(tracer.getImageWidth());
+    public List<Color[]> renderImmediate() {
+        List<Color[]> rows = new ArrayList<>(tracer.getImageWidth());
         for (int y=tracer.getImageHeight()-1; y>=0; y--) {
             rows.add(renderRow(y));
         }
         return rows;
     }
 
-    public List<Vector[]> renderThreaded() {
+    public List<Color[]> renderThreaded() {
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        Map<Integer,Vector[]> rows = new ConcurrentHashMap<>();
+        Map<Integer,Color[]> rows = new ConcurrentHashMap<>();
 
         progress.start();
         for (int i=0; i<tracer.getImageHeight(); i++) {
@@ -73,8 +73,8 @@ public final class Renderer {
     }
 
     /** Renders a single row of the image */
-    public Vector [] renderRow(int y) {
-        Vector [] row = new Vector[tracer.getImageWidth()];
+    public Color[] renderRow(int y) {
+        Color [] row = new Color[tracer.getImageWidth()];
         for (int x=0; x<tracer.getImageWidth(); x++) {
             row[x] = tracer.renderPixel(x, y);
             progress.pixelsComplete(1);
@@ -82,12 +82,12 @@ public final class Renderer {
         return row;
     }
 
-    public void writeData(List<Vector[]> rows) {
+    public void writeData(List<Color[]> rows) {
         BufferedImage image = new BufferedImage(tracer.getImageWidth(), tracer.getImageHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y=0; y<rows.size(); y++) {
-            Vector [] row = rows.get(y);
+            Color [] row = rows.get(y);
             for (int x=0; x<row.length; x++) {
-                Vector pixel = row[x];
+                Color pixel = row[x];
                 int rgb = pixel.toRgb();
                 image.setRGB(x, y, rgb);
             }

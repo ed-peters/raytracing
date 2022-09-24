@@ -1,8 +1,9 @@
-package com.epeters.raytrace.hittables;
+package com.epeters.raytrace.solids;
 
 import com.epeters.raytrace.Ray;
+import com.epeters.raytrace.hittables.Hit;
+import com.epeters.raytrace.hittables.Hittable;
 import com.epeters.raytrace.surfaces.Material;
-import com.epeters.raytrace.surfaces.MaterialParams;
 import com.epeters.raytrace.utils.Box;
 import com.epeters.raytrace.utils.Vector;
 
@@ -56,11 +57,6 @@ public final class ConstantMedium implements Hittable {
             return null;
         }
 
-        return new Hit(ray, r1t + hitDistance / rayLength, this::computeHitColor);
-    }
-
-    private HitColor computeHitColor(Vector point, Vector incoming) {
-        MaterialParams params = MaterialParams.from(point, incoming, NORMAL, -1.0, -1.0);
-        return material.computeHitColor(params);
+        return Hit.from(ray, r1t + hitDistance / rayLength, NORMAL, material, -1.0, -1.0);
     }
 }

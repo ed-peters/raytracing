@@ -1,7 +1,10 @@
-package com.epeters.raytrace.hittables;
+package com.epeters.raytrace.solids;
 
+import com.epeters.raytrace.hittables.Hittable;
+import com.epeters.raytrace.hittables.HittableVolume;
 import com.epeters.raytrace.surfaces.Material;
 import com.epeters.raytrace.surfaces.Texture;
+import com.epeters.raytrace.utils.Color;
 import com.epeters.raytrace.utils.Mesh;
 import com.epeters.raytrace.utils.ObjReader;
 import com.epeters.raytrace.utils.Vector;
@@ -11,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epeters.raytrace.utils.Utils.WHITE;
 import static com.epeters.raytrace.utils.XYZPlane.XY;
 import static com.epeters.raytrace.utils.XYZPlane.YZ;
 import static com.epeters.raytrace.utils.XYZPlane.XZ;
@@ -22,17 +24,17 @@ public class Solids {
         return new Sphere(m, center, radius);
     }
 
-    public static Hittable lsphere(Vector center, double radius, Vector color) {
+    public static Hittable lsphere(Vector center, double radius, Color color) {
         Material m = Material.lambertian(color);
         return sphere(center, radius, m);
     }
 
-    public static Hittable msphere(Vector center, double radius, Vector color, double fuzz) {
+    public static Hittable msphere(Vector center, double radius, Color color, double fuzz) {
         Material m = Material.metal(color, fuzz);
         return sphere(center, radius, m);
     }
 
-    public static Hittable csphere(Vector center, double radius, Vector even, Vector odd) {
+    public static Hittable csphere(Vector center, double radius, Color even, Color odd) {
         Texture t = Texture.checker(even, odd);
         Material m = Material.lambertian(t);
         return sphere(center, radius, m);
@@ -50,12 +52,12 @@ public class Solids {
     }
 
     public static Hittable tsphere(Vector center, double radius, double scale, int depth) {
-        Texture t = Texture.turbulence(WHITE, scale, depth);
+        Texture t = Texture.turbulence(Color.WHITE, scale, depth);
         Material m = Material.lambertian(t);
         return sphere(center, radius, m);
     }
 
-    public static Hittable light(double x0, double y0, double x1, double y1, double z, Vector color) {
+    public static Hittable light(double x0, double y0, double x1, double y1, double z, Color color) {
         Material m = Material.light(color);
         return rect(XYZPlane.XY, x0, y0, x1, y1, z, m);
     }
@@ -91,7 +93,7 @@ public class Solids {
         return HittableVolume.from(sides);
     }
 
-    public static Hittable fog(Hittable boundary, double density, Vector color) {
+    public static Hittable fog(Hittable boundary, double density, Color color) {
         return new ConstantMedium(Material.isotropic(color), boundary, density);
     }
 }

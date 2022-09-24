@@ -1,10 +1,8 @@
 package com.epeters.raytrace.utils;
 
-import static com.epeters.raytrace.utils.Utils.random;
 import static com.epeters.raytrace.utils.Utils.randomUnitVector;
-import static com.epeters.raytrace.utils.Utils.scaleInt;
-import static com.epeters.raytrace.utils.Utils.sqrt;
 
+import static com.epeters.raytrace.utils.Utils.sqrt;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.lang.Math.max;
@@ -27,23 +25,27 @@ public record Vector(double x, double y, double z) {
     }
 
     public Vector negate() {
-        return new Vector(-x, -y, -z);
+        return vec(-x, -y, -z);
     }
 
     public Vector plus(Vector other) {
-        return new Vector(x + other.x, y + other.y, z + other.z);
+        return vec(x + other.x, y + other.y, z + other.z);
     }
 
     public Vector minus(Vector other) {
-        return new Vector(x - other.x, y - other.y, z - other.z);
+        return vec(x - other.x, y - other.y, z - other.z);
     }
 
     public Vector mul(Vector other) {
-        return new Vector(x * other.x, y * other.y, z * other.z);
+        return vec(x * other.x, y * other.y, z * other.z);
     }
 
     public Vector mul(double f) {
-        return new Vector(x * f, y * f, z * f);
+        return vec(x * f, y * f, z * f);
+    }
+
+    public Vector div(double f) {
+        return mul(1.0 / f);
     }
 
     public Vector cross(Vector other) {
@@ -65,12 +67,8 @@ public record Vector(double x, double y, double z) {
         return sqrt(square());
     }
 
-    public double mag() {
-        return sqrt(square());
-    }
-
     public Vector normalize() {
-        return mul(1.0 / mag());
+        return mul(1.0 / length());
     }
 
     public boolean isOpposite(Vector other) {
@@ -85,75 +83,23 @@ public record Vector(double x, double y, double z) {
         return vec(max(x, other.x), max(y, other.y), max(z, other.z));
     }
 
-    public int toRgb() {
-        int r = scaleInt(x(), 255);
-        int g = scaleInt(y(), 255);
-        int b = scaleInt(z(), 255);
-        r = (r << 16) & 0x00FF0000;
-        g = (g << 8) & 0x0000FF00;
-        b = b & 0x000000FF;
-        return 0xFF000000 | r | g | b;
-    }
-
     /**
      * @return a random unit vector that bounces "against" this one
      * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials/analternativediffuseformulation">doc</a>
      */
     public Vector randomHemisphericReflection() {
         Vector next = randomUnitVector();
-        return next.isOpposite(this) ? next : next.negate();
-    }
-
-    /**
-     * @return the result of reflecting this vector against the supplied normal, with optional fuzz
-     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/mirroredlightreflection">doc</a>
-     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/fuzzyreflection">doc</a>
-     */
-    public Vector reflect(Vector normal, double fuzz) {
-        double d = 2.0 * dot(normal);
-        Vector v = plus(normal.mul(-d));
-        if (fuzz > 0.0) {
-            v = v.plus(randomUnitVector().mul(fuzz));
-        }
-        return v;
-    }
-
-    /**
-     * Uses Snell's law for refraction, with Schlick's approximation for reflectance.
-     * @return the result of refracting this ray through a surface with the given index of refraction.
-     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#dielectrics/snell'slaw">guide</a>
-     * @see <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#dielectrics/schlickapproximation">guide</a>
-     */
-    public Vector refract(Vector normal, double ratio) {
-
-        double cos = Math.min(negate().dot(normal), 1.0);
-        double sin = sqrt(1.0 - cos * cos);
-        if (ratio * sin > 1.0) {
-            return reflect(normal, 0.0);
-        }
-
-        double reflectance = (1.0 - ratio) / (1.0 + ratio);
-        reflectance *= reflectance;
-        reflectance += (1.0 - reflectance) * Math.pow(1.0 - cos, 5.0);
-        if (reflectance > random(0.0, 1.0)) {
-            return reflect(normal, 0.0);
-        }
-
-        Vector result = normal.mul(cos).plus(this).mul(ratio);
-        double factor = -sqrt(abs(1.0 - result.square()));
-        return result.plus(normal.mul(factor));
-    }
-
-    public Vector rotateY(double sin, double cos) {
-        double newX = cos * x - sin * z;
-        double newZ = cos * z + sin * x;
-        return vec(newX, y, newZ);
+        return dot(next) < 0.0 ? next.negate() : next;
     }
 
     public boolean equalish(Vector other) {
         return abs(x - other.x) < 0.000001
                 && abs(y - other.y) < 0.000001
                 && abs(z - other.z) < 0.000001;
+    }
+
+    public boolean zeroish() {
+        return abs(x) < 1e-8 && abs(y) < 1e-8 && abs(z) < 1e-8;
     }
 
     public static Vector vec(double x, double y, double z) {
